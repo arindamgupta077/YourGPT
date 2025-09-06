@@ -2,16 +2,163 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>SnehaGPT</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1f2937">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SnehaGPT">
+    <meta name="description" content="SnehaGPT - Your personal AI assistant created by Sneha">
+    <meta name="keywords" content="AI, chatbot, assistant, SnehaGPT">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Mobile-first responsive design */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
             -ms-overflow-style: none; /* IE and Edge */
             scrollbar-width: none; /* Firefox */
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Mobile-specific body adjustments */
+        @media (max-width: 768px) {
+            body {
+                height: 100vh;
+                height: 100dvh; /* Dynamic viewport height for mobile */
+                overflow: hidden;
+            }
+            
+            /* Fix main layout for mobile */
+            .mobile-layout {
+                height: 100vh;
+                height: 100dvh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            
+            /* Mobile chat container */
+            #chat-container {
+                height: calc(100vh - 140px);
+                height: calc(100dvh - 140px);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 1rem;
+            }
+            
+            /* Mobile header */
+            header {
+                flex-shrink: 0;
+                height: auto;
+                min-height: 60px;
+            }
+            
+            /* Mobile input area */
+            #chat-form {
+                flex-shrink: 0;
+                margin: 0 1rem 1rem 1rem;
+            }
+            
+            /* Mobile welcome screen */
+            #welcome-screen {
+                height: calc(100vh - 200px);
+                height: calc(100dvh - 200px);
+                padding: 2rem 1rem;
+            }
+            
+            /* Mobile modals */
+            .modal-content {
+                max-height: 90vh;
+                max-height: 90dvh;
+                margin: 1rem;
+            }
+            
+            /* Mobile message bubbles */
+            .message {
+                max-width: 100%;
+                margin: 0.5rem 0;
+            }
+            
+            .message-content {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+            
+            /* Mobile buttons */
+            button {
+                min-height: 44px; /* iOS touch target size */
+                touch-action: manipulation;
+            }
+            
+            /* Mobile input fields */
+            input, textarea, select {
+                font-size: 16px; /* Prevent zoom on iOS */
+                min-height: 44px;
+            }
+            
+            /* Keyboard open adjustments */
+            .keyboard-open #chat-container {
+                height: calc(100vh - 200px) !important;
+                height: calc(100dvh - 200px) !important;
+            }
+            
+            .keyboard-open #welcome-screen {
+                height: calc(100vh - 250px) !important;
+                height: calc(100dvh - 250px) !important;
+            }
+        }
+        
+        /* Extra small mobile devices */
+        @media (max-width: 480px) {
+            #chat-container {
+                padding: 0.75rem;
+            }
+            
+            #chat-form {
+                margin: 0 0.75rem 0.75rem 0.75rem;
+            }
+            
+            .message-content {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            #welcome-screen {
+                padding: 1rem 0.75rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .text-3xl {
+                font-size: 1.75rem;
+            }
         }
         body::-webkit-scrollbar, #chat-history-container::-webkit-scrollbar {
             display: none; /* Chrome, Safari, and Opera */
@@ -82,6 +229,161 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Mobile sidebar styles */
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 280px;
+            }
+            
+            #sidebar-overlay {
+                backdrop-filter: blur(4px);
+            }
+            
+            /* Prevent body scroll when sidebar is open */
+            body.sidebar-open {
+                overflow: hidden;
+            }
+            
+            /* Mobile sidebar button styling */
+            #mobile-sidebar-btn {
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 200 !important;
+                position: relative;
+                background-color: rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(4px);
+                border-radius: 8px;
+                transition: all 0.2s ease;
+            }
+            
+            #mobile-sidebar-btn:hover {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+            
+            /* Ensure mobile sidebar button is always visible */
+            #mobile-sidebar-btn {
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+            
+            /* Mobile message improvements */
+            .message-bubble .group {
+                max-width: 100% !important;
+            }
+            
+            .message-bubble .group > div:last-child {
+                max-width: calc(100vw - 80px);
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            
+            /* Mobile input improvements */
+            #message-input {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 12px;
+            }
+            
+            /* Touch-friendly buttons */
+            button, .clickable {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Mobile modal improvements */
+            .modal-content {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+                border-radius: 1rem;
+            }
+            
+            /* Better mobile scrolling */
+            #chat-container {
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+            }
+            
+            /* Mobile chat history styling */
+            #chat-history-container {
+                padding: 0.5rem;
+            }
+            
+            #chat-history-container .group {
+                padding: 12px;
+                margin-bottom: 8px;
+            }
+        }
+        
+        /* Touch device optimizations */
+        .touch-manipulation {
+            touch-action: manipulation;
+        }
+        
+        /* Smooth transitions */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        #sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        /* Prevent text selection on buttons */
+        button, .clickable {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Mobile dropdown menu z-index fix */
+        #mobile-menu {
+            z-index: 9999 !important;
+            position: absolute !important;
+        }
+        
+        /* Ensure mobile menu stays above chat content */
+        @media (max-width: 640px) {
+            #mobile-menu {
+                z-index: 9999 !important;
+                position: absolute !important;
+                transform: translateZ(0); /* Force hardware acceleration */
+                will-change: transform; /* Optimize for animations */
+                isolation: isolate; /* Create new stacking context */
+            }
+            
+            /* Ensure mobile menu container has proper stacking context */
+            .sm\\:hidden.relative {
+                z-index: 1000;
+                position: relative;
+            }
+            
+            /* More specific selector for mobile menu container */
+            div.sm\\:hidden.relative {
+                z-index: 1000 !important;
+            }
+            
+            /* Ensure chat content doesn't interfere */
+            #chat-container {
+                z-index: 1;
+                position: relative;
+            }
+            
+            /* Ensure header stays above chat content */
+            header {
+                z-index: 100;
+                position: relative;
+            }
+            
+            
+            /* Prevent any overflow clipping */
+            .sm\\:hidden.relative {
+                overflow: visible !important;
+            }
+        }
         /* Styling for parsed markdown */
         .prose { color: inherit; }
         .prose strong { font-weight: 600; color: inherit; }
@@ -97,23 +399,34 @@
         .prose code { color: #d1d5db; font-family: monospace; }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200 flex h-screen">
+<body class="bg-gray-900 text-gray-200 flex h-screen overflow-hidden">
 
     <!-- Sidebar -->
-    <aside class="bg-gray-950 w-72 p-4 flex-shrink-0 hidden md:flex flex-col">
+    <aside id="sidebar" class="bg-gray-950 w-72 p-4 flex-shrink-0 flex flex-col fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto">
         <div class="flex items-center gap-2 border-b border-gray-700 pb-4 mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
             <h1 class="text-xl font-semibold">SnehaGPT</h1>
+            <!-- Mobile close button -->
+            <button id="close-sidebar-btn" class="md:hidden ml-auto text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
         </div>
         <div class="flex-1 overflow-y-auto pr-2" id="chat-history-container">
             <!-- Chat history will be populated here -->
         </div>
     </aside>
 
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden hidden"></div>
+
     <!-- Main Chat Area -->
-    <main class="flex-1 flex flex-col bg-gray-800">
-        <header class="bg-gray-900/50 backdrop-blur-sm p-4 border-b border-gray-700 flex items-center justify-between">
+    <main class="flex-1 flex flex-col bg-gray-800 mobile-layout">
+        <header class="bg-gray-900/50 backdrop-blur-sm p-4 border-b border-gray-700 flex items-center justify-between relative z-10">
              <div class="flex items-center gap-2">
+                <!-- Mobile menu button for sidebar -->
+                <button id="mobile-sidebar-btn" class="md:hidden text-gray-400 hover:text-white p-2 -ml-2 touch-manipulation">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
                 <h1 class="text-xl font-semibold">SnehaGPT</h1>
             </div>
@@ -186,7 +499,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </button>
                     
-                    <div id="mobile-menu" class="absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 hidden z-50">
+                    <div id="mobile-menu" class="absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 hidden z-[9999] shadow-2xl">
                         <div class="py-2">
                             <button id="new-chat-btn-mobile" class="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -212,13 +525,17 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="m8 12 4 4 4-4"/><path d="M12 16V3"/></svg>
                                 Generate Image
                             </button>
+                            <button id="install-app-btn-mobile" class="w-full text-left px-4 py-2 text-indigo-300 hover:bg-indigo-700/30 flex items-center gap-3 border-t border-gray-600 mt-2 pt-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7,10 12,15 17,10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Install App
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
         
-        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6" style="height: calc(100vh - 140px);">
             <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center">
                 <div class="bg-indigo-500/20 text-indigo-300 rounded-full p-4 mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
@@ -482,6 +799,74 @@
         }
     });
     
+    // --- MOBILE SIDEBAR FUNCTIONALITY ---
+    
+    // Mobile sidebar elements
+    const mobileSidebarBtn = document.getElementById('mobile-sidebar-btn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    
+    // Open sidebar
+    if (mobileSidebarBtn) {
+        mobileSidebarBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Mobile sidebar button clicked'); // Debug log
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+            document.body.classList.add('sidebar-open');
+        });
+    }
+    
+    // Close sidebar function
+    function closeSidebar() {
+        console.log('Closing sidebar'); // Debug log
+        sidebar.classList.add('-translate-x-full');
+        sidebarOverlay.classList.add('hidden');
+        document.body.classList.remove('sidebar-open');
+    }
+    
+    // Close sidebar button
+    if (closeSidebarBtn) {
+        closeSidebarBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeSidebar();
+        });
+    }
+    
+    // Close sidebar when clicking overlay
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeSidebar();
+        });
+    }
+    
+    // Close sidebar when clicking on chat history items
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#chat-history-container .group') && window.innerWidth < 768) {
+            closeSidebar();
+        }
+    });
+    
+    // Close sidebar on window resize to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            closeSidebar();
+        }
+    });
+    
+    // Debug: Check if elements exist
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Mobile sidebar button:', mobileSidebarBtn);
+        console.log('Sidebar:', sidebar);
+        console.log('Sidebar overlay:', sidebarOverlay);
+        console.log('Close sidebar button:', closeSidebarBtn);
+    });
+    
     // Mobile button event listeners
     newChatBtnMobile.addEventListener('click', () => {
         startNewChat();
@@ -507,6 +892,21 @@
         imageModal.classList.add('active');
         mobileMenu.classList.add('hidden');
     });
+    
+    // Mobile install button
+    const installAppBtnMobile = document.getElementById('install-app-btn-mobile');
+    if (installAppBtnMobile) {
+        installAppBtnMobile.addEventListener('click', () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                mobileMenu.classList.add('hidden');
+            } else {
+                // Show manual install instructions
+                alert('To install this app:\n\n1. Tap the menu button (⋮) in your browser\n2. Select "Add to Home Screen" or "Install App"\n3. Follow the prompts to install');
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    }
     imageForm.addEventListener('submit', handleImageGeneration);
     emailForm.addEventListener('submit', handleEmailDrafting);
     codeHelperForm.addEventListener('submit', handleCodeGeneration);
@@ -1264,6 +1664,121 @@
         for (let i = 0; i < pcmData.length; i++) { view.setInt16(44 + i * 2, pcmData[i], true); }
         return new Blob([view], { type: 'audio/wav' });
     }
+
+    // --- PWA INSTALLATION FUNCTIONALITY ---
+    
+    let deferredPrompt;
+    let installButton;
+    
+    // Create install button
+    function createInstallButton() {
+        if (installButton) return;
+        
+        installButton = document.createElement('button');
+        installButton.id = 'install-btn';
+        installButton.className = 'fixed bottom-4 right-4 bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-50 hidden';
+        installButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7,10 12,15 17,10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        `;
+        installButton.title = 'Install SnehaGPT App';
+        
+        document.body.appendChild(installButton);
+        
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
+                installButton.classList.add('hidden');
+            }
+        });
+    }
+    
+    // Listen for the beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('PWA install prompt triggered');
+        e.preventDefault();
+        deferredPrompt = e;
+        createInstallButton();
+        installButton.classList.remove('hidden');
+    });
+    
+    // Listen for the appinstalled event
+    window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed');
+        if (installButton) {
+            installButton.classList.add('hidden');
+        }
+        deferredPrompt = null;
+    });
+    
+    // Check if app is already installed
+    window.addEventListener('load', () => {
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('App is running in standalone mode');
+        }
+    });
+    
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then((registration) => {
+                    console.log('SW registered: ', registration);
+                })
+                .catch((registrationError) => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+        });
+    }
+    
+    // --- MOBILE LAYOUT FIXES ---
+    
+    // Function to adjust mobile layout
+    function adjustMobileLayout() {
+        if (window.innerWidth <= 768) {
+            const chatContainer = document.getElementById('chat-container');
+            const header = document.querySelector('header');
+            const chatForm = document.getElementById('chat-form');
+            
+            if (chatContainer && header && chatForm) {
+                const headerHeight = header.offsetHeight;
+                const formHeight = chatForm.offsetHeight;
+                const availableHeight = window.innerHeight - headerHeight - formHeight - 20; // 20px margin
+                
+                chatContainer.style.height = `${availableHeight}px`;
+                chatContainer.style.maxHeight = `${availableHeight}px`;
+            }
+        }
+    }
+    
+    // Adjust layout on load and resize
+    window.addEventListener('load', adjustMobileLayout);
+    window.addEventListener('resize', adjustMobileLayout);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(adjustMobileLayout, 100);
+    });
+    
+    // Handle virtual keyboard on mobile
+    let initialViewportHeight = window.innerHeight;
+    window.addEventListener('resize', () => {
+        const currentHeight = window.innerHeight;
+        const heightDifference = initialViewportHeight - currentHeight;
+        
+        // If height decreased significantly, keyboard is likely open
+        if (heightDifference > 150) {
+            document.body.classList.add('keyboard-open');
+        } else {
+            document.body.classList.remove('keyboard-open');
+        }
+        
+        adjustMobileLayout();
+    });
 
 </script>
 </body>
