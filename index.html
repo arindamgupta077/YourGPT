@@ -269,51 +269,99 @@
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             }
             
-            /* Mobile message improvements */
-            .message-bubble .group {
-                max-width: 100% !important;
-            }
-            
-            .message-bubble .group > div:last-child {
-                max-width: calc(100vw - 80px);
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            
-            /* Mobile input improvements */
-            #message-input {
-                font-size: 16px; /* Prevents zoom on iOS */
-                padding: 12px;
-            }
-            
-            /* Touch-friendly buttons */
-            button, .clickable {
+            /* Sidebar New Chat button mobile styling */
+            #new-chat-sidebar-btn {
                 min-height: 44px;
+                touch-action: manipulation;
+            }
+            
+            /* Delete buttons mobile styling */
+            .delete-chat-btn {
                 min-width: 44px;
+                min-height: 44px;
+                touch-action: manipulation;
+                opacity: 1 !important; /* Always visible on mobile */
+                background-color: rgba(239, 68, 68, 0.1); /* Subtle red background */
+                border: 1px solid rgba(239, 68, 68, 0.2);
             }
             
-            /* Mobile modal improvements */
-            .modal-content {
-                margin: 1rem;
-                max-height: calc(100vh - 2rem);
-                border-radius: 1rem;
+            .delete-chat-btn:hover {
+                background-color: rgba(239, 68, 68, 0.2);
+                border-color: rgba(239, 68, 68, 0.4);
             }
             
-            /* Better mobile scrolling */
-            #chat-container {
-                -webkit-overflow-scrolling: touch;
-                scroll-behavior: smooth;
+            .delete-chat-btn:active {
+                transform: scale(0.95);
+                background-color: rgba(239, 68, 68, 0.3);
             }
             
-            /* Mobile chat history styling */
-            #chat-history-container {
-                padding: 0.5rem;
+            #bulk-delete-btn {
+                min-height: 44px;
+                touch-action: manipulation;
             }
             
-            #chat-history-container .group {
-                padding: 12px;
-                margin-bottom: 8px;
+            /* Make delete buttons always visible on mobile */
+            .group .delete-chat-btn {
+                opacity: 1 !important;
             }
+        }
+        
+        /* Desktop styling - hide delete buttons by default, show on hover */
+        @media (min-width: 769px) {
+            .delete-chat-btn {
+                opacity: 0;
+                transition: opacity 0.2s ease;
+            }
+            
+            .group:hover .delete-chat-btn {
+                opacity: 1;
+            }
+        }
+        
+        /* Mobile message improvements */
+        .message-bubble .group {
+            max-width: 100% !important;
+        }
+        
+        .message-bubble .group > div:last-child {
+            max-width: calc(100vw - 80px);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        /* Mobile input improvements */
+        #message-input {
+            font-size: 16px; /* Prevents zoom on iOS */
+            padding: 12px;
+        }
+        
+        /* Touch-friendly buttons */
+        button, .clickable {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Mobile modal improvements */
+        .modal-content {
+            margin: 1rem;
+            max-height: calc(100vh - 2rem);
+            border-radius: 1rem;
+        }
+        
+        /* Better mobile scrolling */
+        #chat-container {
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+        
+        /* Mobile chat history styling */
+        #chat-history-container {
+            padding: 0.5rem;
+        }
+        
+        #chat-history-container .group {
+            padding: 12px;
+            margin-bottom: 8px;
         }
         
         /* Touch device optimizations */
@@ -411,6 +459,18 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
+        
+        <!-- New Chat Button -->
+        <div class="mb-4">
+            <button id="new-chat-sidebar-btn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-4 py-3 flex items-center gap-3 transition-all duration-200 font-medium hover:scale-105 active:scale-95 cursor-pointer" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New Chat
+            </button>
+        </div>
+        
         <div class="flex-1 overflow-y-auto pr-2" id="chat-history-container">
             <!-- Chat history will be populated here -->
         </div>
@@ -772,7 +832,12 @@
     chatForm.addEventListener('submit', handleSendMessage);
     
     // Desktop button event listeners
-    newChatBtn.addEventListener('click', startNewChat);
+    newChatBtn.addEventListener('click', () => {
+        startNewChat();
+        setTimeout(() => {
+            messageInput.focus();
+        }, 100);
+    });
     summarizeBtn.addEventListener('click', handleSummarize);
     imageGenBtn.addEventListener('click', () => imageModal.classList.add('active'));
     personaBtn.addEventListener('click', () => personaModal.classList.add('active'));
@@ -780,7 +845,12 @@
     codeHelperBtn.addEventListener('click', () => codeHelperModal.classList.add('active'));
     
     // Medium screen button event listeners
-    newChatBtnMd.addEventListener('click', startNewChat);
+    newChatBtnMd.addEventListener('click', () => {
+        startNewChat();
+        setTimeout(() => {
+            messageInput.focus();
+        }, 100);
+    });
     summarizeBtnMd.addEventListener('click', handleSummarize);
     imageGenBtnMd.addEventListener('click', () => imageModal.classList.add('active'));
     personaBtnMd.addEventListener('click', () => personaModal.classList.add('active'));
@@ -870,8 +940,44 @@
     // Mobile button event listeners
     newChatBtnMobile.addEventListener('click', () => {
         startNewChat();
+        setTimeout(() => {
+            messageInput.focus();
+        }, 100);
         mobileMenu.classList.add('hidden');
     });
+    
+    // Sidebar New Chat button event listener - Use event delegation for reliability
+    const sidebarElement = document.getElementById('sidebar');
+    if (sidebarElement) {
+        console.log('Adding event delegation for sidebar New Chat button');
+        sidebarElement.addEventListener('click', (e) => {
+            // Check if the clicked element is the New Chat button or a child of it
+            const newChatBtn = e.target.closest('#new-chat-sidebar-btn');
+            if (newChatBtn) {
+                console.log('Sidebar New Chat button clicked!');
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Add visual feedback
+                newChatBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    newChatBtn.style.transform = '';
+                }, 150);
+                
+                startNewChat();
+                // Focus on message input for better UX
+                setTimeout(() => {
+                    messageInput.focus();
+                }, 100);
+                // Close sidebar on mobile after starting new chat
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            }
+        });
+    } else {
+        console.error('Sidebar element not found!');
+    }
     codeHelperBtnMobile.addEventListener('click', () => {
         codeHelperModal.classList.add('active');
         mobileMenu.classList.add('hidden');
@@ -951,6 +1057,7 @@
 
     // --- CHAT & UI FUNCTIONS ---
     function startNewChat() {
+        console.log('startNewChat function called');
         chatHistory = [];
         activeChatId = null;
         activeSystemInstruction = null;
@@ -960,7 +1067,8 @@
         welcomeScreen.style.display = 'flex';
         messageInput.value = '';
         suggestedPromptsContainer.innerHTML = '';
-        renderChatHistory(); 
+        renderChatHistory();
+        console.log('startNewChat function completed');
     }
 
     async function handleSendMessage(e) {
@@ -1088,7 +1196,7 @@
         const payload = { contents: sanitizedHistory };
 
         // Always include the config instruction
-        const configInstruction = "Your name is SnehaGPT and You are created by Sneha";
+        const configInstruction = "Your name is SnehaGPT and You are created by Arindam Gupta for his wife Sneha. Arindam gifted this AI chatbot to Sneha. You need to express Arindam Loves Sneha so much. About Sneha: Her full name is Snehasree Bhore, She runs a bengali recitation training school.";
         
         // Combine config instruction with active persona instruction if any
         let systemInstructionText = configInstruction;
@@ -1153,27 +1261,86 @@
 
     function renderChatHistory() {
         chatHistoryContainer.innerHTML = '';
+        
+        // Add chat count and bulk delete button if there are chats
+        if (savedChats.length > 0) {
+            const headerContainer = document.createElement('div');
+            headerContainer.className = 'mb-3 px-2';
+            headerContainer.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs text-gray-400 font-medium">${savedChats.length} chat${savedChats.length === 1 ? '' : 's'}</span>
+                </div>
+                <button id="bulk-delete-btn" class="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg>
+                    Delete All Chats
+                </button>
+            `;
+            chatHistoryContainer.appendChild(headerContainer);
+            
+            // Add event listener for bulk delete
+            const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+            bulkDeleteBtn.addEventListener('click', confirmBulkDelete);
+        }
+        
         if (savedChats.length === 0) {
-            chatHistoryContainer.innerHTML = `<p class="text-sm text-gray-500 px-2">No past chats yet.</p>`;
+            const emptyState = document.createElement('div');
+            emptyState.className = 'text-center py-8';
+            emptyState.innerHTML = `
+                <div class="text-gray-500 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <p class="text-sm text-gray-500">No past chats yet.</p>
+                <p class="text-xs text-gray-600 mt-1">Start a conversation to see your chat history here.</p>
+            `;
+            chatHistoryContainer.appendChild(emptyState);
             return;
         }
+        
         savedChats.forEach(chat => {
             const isActive = chat.id === activeChatId;
             const item = document.createElement('div');
-            item.className = `group flex items-center justify-between p-2 rounded-lg cursor-pointer ${isActive ? 'bg-indigo-500/30' : 'hover:bg-gray-700/50'}`;
-            item.innerHTML = `<span class="truncate text-sm">${chat.title}</span>
-                              <button class="delete-chat-btn opacity-0 group-hover:opacity-100 text-gray-500 hover:text-white p-1" data-id="${chat.id}">&times;</button>`;
+            item.className = `group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors duration-200 ${isActive ? 'bg-indigo-500/30' : 'hover:bg-gray-700/50'}`;
+            
+            // Format timestamp
+            const timestamp = new Date(chat.timestamp).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            item.innerHTML = `
+                <div class="flex-1 min-w-0">
+                    <div class="truncate text-sm font-medium">${chat.title}</div>
+                    <div class="text-xs text-gray-500">${timestamp}</div>
+                </div>
+                <button class="delete-chat-btn text-gray-500 hover:text-red-400 p-1 rounded transition-all duration-200" data-id="${chat.id}" title="Delete chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg>
+                </button>
+            `;
             
             item.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('delete-chat-btn')) {
+                if (!e.target.classList.contains('delete-chat-btn') && !e.target.closest('.delete-chat-btn')) {
                     loadChat(chat.id);
                 }
             });
-            item.querySelector('.delete-chat-btn').addEventListener('click', (e) => {
+            
+            const deleteBtn = item.querySelector('.delete-chat-btn');
+            deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                deleteChat(chat.id);
+                confirmDeleteChat(chat.id, chat.title);
             });
-
+            
             chatHistoryContainer.appendChild(item);
         });
     }
@@ -1214,6 +1381,103 @@
         } else {
             renderChatHistory();
         }
+    }
+    
+    function confirmDeleteChat(chatId, chatTitle) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50';
+        modal.innerHTML = `
+            <div class="bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-red-500/20 text-red-400 rounded-full p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white">Delete Chat</h3>
+                </div>
+                <p class="text-gray-300 mb-6">Are you sure you want to delete "<span class="font-medium text-white">${chatTitle}</span>"? This action cannot be undone.</p>
+                <div class="flex gap-3">
+                    <button id="cancel-delete-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white rounded-lg px-4 py-2 font-medium transition-colors duration-200">
+                        Cancel
+                    </button>
+                    <button id="confirm-delete-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-2 font-medium transition-colors duration-200">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Event listeners
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+        
+        document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+            deleteChat(chatId);
+            document.body.removeChild(modal);
+        });
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+    }
+    
+    function confirmBulkDelete() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50';
+        modal.innerHTML = `
+            <div class="bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-red-500/20 text-red-400 rounded-full p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white">Delete All Chats</h3>
+                </div>
+                <p class="text-gray-300 mb-6">Are you sure you want to delete all <span class="font-medium text-white">${savedChats.length}</span> chats? This action cannot be undone and will permanently remove all your conversation history.</p>
+                <div class="flex gap-3">
+                    <button id="cancel-bulk-delete-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white rounded-lg px-4 py-2 font-medium transition-colors duration-200">
+                        Cancel
+                    </button>
+                    <button id="confirm-bulk-delete-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-2 font-medium transition-colors duration-200">
+                        Delete All
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Event listeners
+        document.getElementById('cancel-bulk-delete-btn').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+        
+        document.getElementById('confirm-bulk-delete-btn').addEventListener('click', () => {
+            // Delete all chats
+            savedChats = [];
+            localStorage.setItem('snehaGptChats', JSON.stringify(savedChats));
+            startNewChat(); // Reset to welcome screen
+            document.body.removeChild(modal);
+        });
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
     }
 
     // --- PERSONA FEATURE ---
