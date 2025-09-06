@@ -1,0 +1,29 @@
+{
+  "name": "snehagpt",
+  "version": "1.0.0",
+  "description": "A modern AI chat application with multiple features",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 3000 -o",
+    "dev": "npx live-server --port=3000 --open=/index.html",
+    "build": "echo 'No build process needed for static HTML'",
+    "serve": "npx http-server . -p 8080"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "gemini",
+    "javascript",
+    "html"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
