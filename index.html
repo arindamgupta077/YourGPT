@@ -148,7 +148,12 @@
             #chat-form {
                 flex-shrink: 0;
                 margin: 0 0.75rem 0.75rem 0.75rem;
-                padding: 0.5rem;
+                padding: 0.75rem;
+                border-radius: 20px;
+                background: var(--bg-glass);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--border-neon);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             }
             
             /* Mobile welcome screen */
@@ -190,9 +195,27 @@
             /* Mobile input fields */
             input, textarea, select {
                 font-size: 16px; /* Prevent zoom on iOS */
-                min-height: 48px;
-                border-radius: 12px;
-                padding: 12px 16px;
+                min-height: 52px;
+                border-radius: 16px;
+                padding: 14px 18px;
+                border: 2px solid var(--border-neon);
+                background: rgba(0, 0, 0, 0.3);
+                color: var(--text-primary);
+                transition: all 0.3s ease;
+            }
+            
+            /* Mobile input focus state */
+            input:focus, textarea:focus {
+                outline: none;
+                border-color: var(--primary-neon);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+                background: rgba(0, 255, 255, 0.05);
+            }
+            
+            /* Mobile input placeholder */
+            input::placeholder, textarea::placeholder {
+                color: var(--text-muted);
+                opacity: 0.8;
             }
             
             /* Mobile action buttons */
@@ -213,6 +236,43 @@
                 min-height: 48px;
                 padding: 12px 16px;
                 font-size: 14px;
+            }
+            
+            /* Mobile typing area buttons */
+            #chat-form button {
+                min-height: 52px;
+                min-width: 52px;
+                border-radius: 16px;
+                padding: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Mobile send button enhancement */
+            #chat-form button[type="submit"] {
+                background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon));
+                border: 2px solid var(--primary-neon);
+                box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+                transition: all 0.3s ease;
+            }
+            
+            #chat-form button[type="submit"]:active {
+                transform: scale(0.95);
+                box-shadow: 0 2px 10px rgba(0, 255, 255, 0.5);
+            }
+            
+            /* Mobile action buttons in typing area */
+            #chat-form .btn-futuristic {
+                background: var(--bg-glass);
+                border: 2px solid var(--border-neon);
+                backdrop-filter: blur(15px);
+            }
+            
+            #chat-form .btn-futuristic:active {
+                transform: scale(0.95);
+                border-color: var(--primary-neon);
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
             }
             
             /* Keyboard open adjustments */
@@ -280,9 +340,25 @@
             
             /* Extra small input fields */
             input, textarea, select {
-                min-height: 44px;
-                padding: 10px 12px;
+                min-height: 48px;
+                padding: 12px 14px;
                 font-size: 16px;
+                border-radius: 14px;
+            }
+            
+            /* Extra small typing area */
+            #chat-form {
+                margin: 0 0.5rem 0.5rem 0.5rem;
+                padding: 0.5rem;
+                border-radius: 16px;
+            }
+            
+            /* Extra small typing buttons */
+            #chat-form button {
+                min-height: 48px;
+                min-width: 48px;
+                border-radius: 14px;
+                padding: 12px;
             }
             
             /* Extra small header */
@@ -719,6 +795,50 @@
                     -webkit-tap-highlight-color: transparent;
                     -webkit-touch-callout: none;
                     -webkit-user-select: none;
+                }
+                
+                /* iOS typing area enhancements */
+                #chat-form {
+                    -webkit-transform: translateZ(0);
+                    transform: translateZ(0);
+                }
+                
+                /* iOS input focus improvements */
+                #message-input:focus {
+                    -webkit-appearance: none;
+                    appearance: none;
+                }
+            }
+        }
+        
+        /* Mobile typing area animations */
+        @media (max-width: 768px) {
+            #chat-form {
+                animation: slideUpMobile 0.3s ease-out;
+            }
+            
+            @keyframes slideUpMobile {
+                from {
+                    transform: translateY(20px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            /* Mobile input glow effect */
+            #message-input:focus {
+                animation: inputGlow 2s ease-in-out infinite alternate;
+            }
+            
+            @keyframes inputGlow {
+                from {
+                    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+                }
+                to {
+                    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
                 }
             }
         }
@@ -1409,8 +1529,11 @@
             lastTouchEnd = now;
         }, false);
         
-        // Handle virtual keyboard
+        // Handle virtual keyboard with enhanced typing area support
         const originalHeight = window.innerHeight;
+        const messageInput = document.getElementById('message-input');
+        const chatForm = document.getElementById('chat-form');
+        
         window.addEventListener('resize', function() {
             const currentHeight = window.innerHeight;
             const heightDifference = originalHeight - currentHeight;
@@ -1418,11 +1541,37 @@
             if (heightDifference > 150) {
                 // Keyboard is open
                 document.body.classList.add('keyboard-open');
+                // Scroll to input area when keyboard opens
+                setTimeout(() => {
+                    chatForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
             } else {
                 // Keyboard is closed
                 document.body.classList.remove('keyboard-open');
             }
         });
+        
+        // Enhanced mobile input handling
+        if (messageInput) {
+            // Auto-focus and scroll to input on mobile
+            messageInput.addEventListener('focus', function() {
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+            
+            // Handle input events for better mobile UX
+            messageInput.addEventListener('input', function() {
+                // Auto-resize input if needed
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+            
+            // Prevent zoom on focus for iOS
+            messageInput.addEventListener('touchstart', function() {
+                this.style.fontSize = '16px';
+            });
+        }
         
         // Improve touch scrolling
         let isScrolling = false;
