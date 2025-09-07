@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snehagpt-v1.0.0';
+const CACHE_NAME = 'yourgpt-v1.0.0';
 const urlsToCache = [
   '/',
   '/index.html',

@@ -1,7 +1,7 @@
 {
-  "name": "SnehaGPT - AI Assistant",
-  "short_name": "SnehaGPT",
-  "description": "Your personal AI assistant created by Sneha",
+  "name": "YourGPT - AI Assistant",
+  "short_name": "YourGPT",
+  "description": "Your personal AI assistant",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1f2937",
@@ -26,7 +26,7 @@
   ],
   "screenshots": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 375 812' fill='%231f2937'><rect width='375' height='812' fill='%231f2937'/><text x='187.5' y='400' text-anchor='middle' fill='%236366f1' font-family='Arial' font-size='24'>SnehaGPT</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 375 812' fill='%231f2937'><rect width='375' height='812' fill='%231f2937'/><text x='187.5' y='400' text-anchor='middle' fill='%236366f1' font-family='Arial' font-size='24'>YourGPT</text></svg>",
       "sizes": "375x812",
       "type": "image/svg+xml",
       "form_factor": "narrow"

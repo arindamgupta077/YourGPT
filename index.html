@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <title>SnehaGPT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>YourGPT</title>
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#1f2937">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SnehaGPT">
-    <meta name="description" content="SnehaGPT - Your personal AI assistant created by Sneha">
-    <meta name="keywords" content="AI, chatbot, assistant, SnehaGPT">
+    <meta name="apple-mobile-web-app-title" content="YourGPT">
+    <meta name="description" content="YourGPT - Your personal AI assistant">
+    <meta name="keywords" content="AI, chatbot, assistant, YourGPT">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -21,8 +21,26 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Futuristic Theme Variables */
+        :root {
+            --primary-neon: #00ffff;
+            --secondary-neon: #ff00ff;
+            --accent-neon: #00ff00;
+            --warning-neon: #ffff00;
+            --bg-dark: #0a0a0a;
+            --bg-darker: #050505;
+            --bg-card: rgba(15, 15, 15, 0.8);
+            --bg-glass: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #808080;
+            --border-neon: rgba(0, 255, 255, 0.3);
+            --shadow-neon: 0 0 20px rgba(0, 255, 255, 0.3);
+            --shadow-neon-strong: 0 0 30px rgba(0, 255, 255, 0.6);
+        }
+
         /* Mobile-first responsive design */
         * {
             box-sizing: border-box;
@@ -42,6 +60,51 @@
             padding: 0;
             overflow-x: hidden;
             position: relative;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 255, 0, 0.05) 0%, transparent 50%),
+                linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+            z-index: -2;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        /* Grid Pattern Overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 30s linear infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
         }
         
         /* Mobile-specific body adjustments */
@@ -50,6 +113,8 @@
                 height: 100vh;
                 height: 100dvh; /* Dynamic viewport height for mobile */
                 overflow: hidden;
+                -webkit-text-size-adjust: 100%;
+                -webkit-tap-highlight-color: transparent;
             }
             
             /* Fix main layout for mobile */
@@ -67,7 +132,8 @@
                 height: calc(100dvh - 140px);
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
-                padding: 1rem;
+                padding: 0.75rem;
+                overscroll-behavior: contain;
             }
             
             /* Mobile header */
@@ -75,26 +141,29 @@
                 flex-shrink: 0;
                 height: auto;
                 min-height: 60px;
+                padding: 0.75rem;
             }
             
             /* Mobile input area */
             #chat-form {
                 flex-shrink: 0;
-                margin: 0 1rem 1rem 1rem;
+                margin: 0 0.75rem 0.75rem 0.75rem;
+                padding: 0.5rem;
             }
             
             /* Mobile welcome screen */
             #welcome-screen {
                 height: calc(100vh - 200px);
                 height: calc(100dvh - 200px);
-                padding: 2rem 1rem;
+                padding: 1.5rem 0.75rem;
             }
             
             /* Mobile modals */
             .modal-content {
                 max-height: 90vh;
                 max-height: 90dvh;
-                margin: 1rem;
+                margin: 0.5rem;
+                border-radius: 16px;
             }
             
             /* Mobile message bubbles */
@@ -109,16 +178,41 @@
                 line-height: 1.4;
             }
             
-            /* Mobile buttons */
+            /* Mobile buttons - Enhanced touch targets */
             button {
-                min-height: 44px; /* iOS touch target size */
+                min-height: 48px; /* Larger touch target for better mobile UX */
+                min-width: 48px;
                 touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+                border-radius: 12px;
             }
             
             /* Mobile input fields */
             input, textarea, select {
                 font-size: 16px; /* Prevent zoom on iOS */
-                min-height: 44px;
+                min-height: 48px;
+                border-radius: 12px;
+                padding: 12px 16px;
+            }
+            
+            /* Mobile action buttons */
+            .copy-btn, .fact-check-btn, .refine-btn, .tts-btn {
+                min-height: 48px !important;
+                min-width: 48px !important;
+                padding: 12px !important;
+            }
+            
+            /* Mobile sidebar */
+            #sidebar {
+                width: 100vw;
+                max-width: 320px;
+            }
+            
+            /* Mobile header buttons */
+            .btn-futuristic, .btn-neon-primary {
+                min-height: 48px;
+                padding: 12px 16px;
+                font-size: 14px;
             }
             
             /* Keyboard open adjustments */
@@ -131,33 +225,82 @@
                 height: calc(100vh - 250px) !important;
                 height: calc(100dvh - 250px) !important;
             }
+            
+            /* Mobile typography */
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            h2 {
+                font-size: 1.25rem;
+            }
+            
+            /* Mobile glass cards */
+            .glass-card {
+                border-radius: 16px;
+                padding: 1rem;
+            }
         }
         
         /* Extra small mobile devices */
         @media (max-width: 480px) {
             #chat-container {
-                padding: 0.75rem;
+                padding: 0.5rem;
             }
             
             #chat-form {
-                margin: 0 0.75rem 0.75rem 0.75rem;
+                margin: 0 0.5rem 0.5rem 0.5rem;
+                padding: 0.5rem;
             }
             
             .message-content {
-                padding: 0.5rem;
-                font-size: 0.85rem;
+                padding: 0.75rem;
+                font-size: 0.9rem;
             }
             
             #welcome-screen {
-                padding: 1rem 0.75rem;
+                padding: 1rem 0.5rem;
             }
             
             h2 {
-                font-size: 1.5rem;
+                font-size: 1.25rem;
             }
             
             .text-3xl {
-                font-size: 1.75rem;
+                font-size: 1.5rem;
+            }
+            
+            /* Extra small buttons */
+            button {
+                min-height: 44px;
+                min-width: 44px;
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            
+            /* Extra small input fields */
+            input, textarea, select {
+                min-height: 44px;
+                padding: 10px 12px;
+                font-size: 16px;
+            }
+            
+            /* Extra small header */
+            header {
+                padding: 0.5rem;
+                min-height: 56px;
+            }
+            
+            /* Extra small modals */
+            .modal-content {
+                margin: 0.25rem;
+                border-radius: 12px;
+            }
+            
+            /* Extra small sidebar */
+            #sidebar {
+                width: 100vw;
+                max-width: 280px;
             }
         }
         body::-webkit-scrollbar, #chat-history-container::-webkit-scrollbar {
@@ -188,46 +331,396 @@
             background-color: #4f4f4f;
             border-radius: 4px;
         }
+        /* Futuristic Button Styles */
+        .btn-futuristic {
+            background: linear-gradient(135deg, var(--bg-glass), var(--bg-card));
+            border: 1px solid var(--border-neon);
+            color: var(--text-primary);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-futuristic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-futuristic:hover {
+            border-color: var(--primary-neon);
+            box-shadow: var(--shadow-neon);
+            transform: translateY(-2px);
+        }
+
+        .btn-futuristic:hover::before {
+            left: 100%;
+        }
+
+        .btn-futuristic:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-neon-strong);
+        }
+
+        /* Primary Neon Button */
+        .btn-neon-primary {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.05));
+            border: 2px solid var(--primary-neon);
+            color: var(--primary-neon);
+            text-shadow: 0 0 10px var(--primary-neon);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .btn-neon-primary:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1));
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+            text-shadow: 0 0 20px var(--primary-neon);
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-neon);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--primary-neon);
+            box-shadow: 0 8px 32px rgba(0, 255, 255, 0.2);
+            transform: translateY(-4px);
+        }
+
+        /* Message Bubbles with Futuristic Style */
         .message-bubble {
             opacity: 0;
-            transform: translateY(20px);
-            animation: slideUp 0.5s ease-out forwards;
+            transform: translateY(20px) scale(0.95);
+            animation: slideUpFuturistic 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-neon);
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        /* Smooth Bot Message Animation */
+        .message-bubble.bot-message {
+            opacity: 0;
+            transform: translateX(-30px) translateY(10px) scale(0.9);
+            animation: botMessageSlideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
+
+        .message-bubble.user-message {
+            opacity: 0;
+            transform: translateX(30px) translateY(10px) scale(0.9);
+            animation: userMessageSlideIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes botMessageSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px) translateY(10px) scale(0.9);
+                filter: blur(2px);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateX(-10px) translateY(5px) scale(0.95);
+                filter: blur(1px);
+                box-shadow: 0 8px 30px rgba(255, 0, 255, 0.3);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) translateY(0) scale(1);
+                filter: blur(0);
+                box-shadow: 0 4px 20px rgba(255, 0, 255, 0.2);
+            }
+        }
+
+        @keyframes userMessageSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(30px) translateY(10px) scale(0.9);
+                filter: blur(2px);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateX(10px) translateY(5px) scale(0.95);
+                filter: blur(1px);
+                box-shadow: 0 8px 30px rgba(0, 255, 255, 0.3);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) translateY(0) scale(1);
+                filter: blur(0);
+                box-shadow: 0 4px 20px rgba(0, 255, 255, 0.2);
+            }
+        }
+
+        .message-bubble.user {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.05));
+            border-color: var(--primary-neon);
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .message-bubble.assistant {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(255, 0, 255, 0.05));
+            border-color: var(--secondary-neon);
+            box-shadow: 0 4px 20px rgba(255, 0, 255, 0.2);
+        }
+
+        @keyframes slideUpFuturistic {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        /* Futuristic Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 16px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-neon);
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
         .typing-indicator span {
-            height: 8px; width: 8px; background-color: #9ca3af;
-            display: inline-block; border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
+            height: 8px; 
+            width: 8px; 
+            background: var(--primary-neon);
+            display: inline-block; 
+            border-radius: 50%;
+            animation: neonBounce 1.4s infinite ease-in-out both;
+            box-shadow: 0 0 10px var(--primary-neon);
         }
+        
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1.0); }
+        
+        @keyframes neonBounce {
+            0%, 80%, 100% { 
+                transform: scale(0);
+                box-shadow: 0 0 5px var(--primary-neon);
+            }
+            40% { 
+                transform: scale(1.0);
+                box-shadow: 0 0 15px var(--primary-neon);
+            }
         }
         
+        /* Futuristic Modal Styles */
         .modal-overlay {
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0; 
+            visibility: hidden;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal-content {
-            transform: scale(0.95); transition: transform 0.3s ease;
-        }
-        .modal-overlay.active .modal-content { transform: scale(1); }
         
-        .loader {
-            width: 48px; height: 48px; border: 5px solid #FFF;
-            border-bottom-color: #6366f1; border-radius: 50%;
-            display: inline-block; box-sizing: border-box;
-            animation: rotation 1s linear infinite;
+        .modal-overlay.active { 
+            opacity: 1; 
+            visibility: visible; 
         }
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .modal-content {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-neon);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9) translateY(20px); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .modal-overlay.active .modal-content { 
+            transform: scale(1) translateY(0); 
+        }
+        
+        /* Futuristic Loader */
+        .loader {
+            width: 48px; 
+            height: 48px; 
+            border: 3px solid transparent;
+            border-top: 3px solid var(--primary-neon);
+            border-right: 3px solid var(--secondary-neon);
+            border-radius: 50%;
+            display: inline-block; 
+            box-sizing: border-box;
+            animation: neonRotation 1s linear infinite;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        @keyframes neonRotation {
+            0% { 
+                transform: rotate(0deg);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            }
+            100% { 
+                transform: rotate(360deg);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            }
+        }
+
+        /* Futuristic Input Fields */
+        .input-futuristic {
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-neon);
+            border-radius: 12px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .input-futuristic:focus {
+            outline: none;
+            border-color: var(--primary-neon);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .input-futuristic::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Futuristic Scrollbars */
+        .futuristic-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .futuristic-scrollbar::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+            border-radius: 4px;
+        }
+
+        .futuristic-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary-neon), var(--secondary-neon));
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .futuristic-scrollbar::-webkit-scrollbar-thumb:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Glow Effects */
+        .glow-neon {
+            box-shadow: 0 0 20px var(--primary-neon);
+            animation: glowPulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            from {
+                box-shadow: 0 0 20px var(--primary-neon);
+            }
+            to {
+                box-shadow: 0 0 30px var(--primary-neon), 0 0 40px var(--primary-neon);
+            }
+        }
+
+        /* Action Button Icon Centering */
+        .copy-btn, .fact-check-btn, .refine-btn, .tts-btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .copy-btn svg, .fact-check-btn svg, .refine-btn svg, .tts-btn svg {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Text Glow Effects */
+        .text-glow {
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .text-glow-strong {
+            text-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+        }
+
+        /* Mobile Performance Optimizations */
+        @media (max-width: 768px) {
+            /* Reduce animations on mobile for better performance */
+            .message-bubble {
+                animation-duration: 0.4s;
+            }
+            
+            /* Optimize backdrop filters for mobile */
+            .glass-card {
+                backdrop-filter: blur(10px);
+            }
+            
+            /* Reduce glow effects on mobile */
+            .glow-neon {
+                animation: none;
+                box-shadow: 0 0 15px var(--primary-neon);
+            }
+            
+            /* Optimize grid animation for mobile */
+            body::after {
+                animation-duration: 60s;
+            }
+            
+            /* Better touch feedback */
+            button:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+            
+            /* Improve scrolling performance */
+            #chat-container {
+                will-change: scroll-position;
+                transform: translateZ(0);
+            }
+            
+            /* Optimize message bubbles for mobile */
+            .message-bubble {
+                will-change: transform, opacity;
+            }
+        }
+
+        /* Mobile Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            @media (max-width: 768px) {
+                /* Fix iOS viewport issues */
+                body {
+                    -webkit-overflow-scrolling: touch;
+                }
+                
+                /* Fix iOS input zoom */
+                input[type="text"], input[type="email"], textarea {
+                    font-size: 16px !important;
+                    transform: translateZ(0);
+                }
+                
+                /* Fix iOS button highlighting */
+                button {
+                    -webkit-tap-highlight-color: transparent;
+                    -webkit-touch-callout: none;
+                    -webkit-user-select: none;
+                }
+            }
         }
         
         /* Mobile sidebar styles */
@@ -420,6 +913,17 @@
                 position: relative;
             }
             
+            /* Fix floating text issue */
+            .message-bubble {
+                position: relative;
+                z-index: 1;
+            }
+            
+            .prose {
+                position: relative;
+                z-index: 1;
+            }
+            
             /* Ensure header stays above chat content */
             header {
                 z-index: 100;
@@ -445,15 +949,74 @@
         .prose th { background-color: #374151; font-weight: 600; }
         .prose pre { background-color: #1f2937; padding: 1rem; border-radius: 0.5rem; white-space: pre-wrap; word-wrap: break-word; }
         .prose code { color: #d1d5db; font-family: monospace; }
+        
+        /* Enhanced formatting for better organization */
+        .prose strong, .prose b { 
+            color: var(--primary-neon); 
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+        }
+        
+        .prose ul, .prose ol { 
+            margin: 1rem 0; 
+            padding-left: 1.5rem; 
+        }
+        
+        .prose li { 
+            margin: 0.5rem 0; 
+            line-height: 1.6;
+        }
+        
+        .prose ul li::marker { 
+            color: var(--primary-neon); 
+            font-size: 1.2em;
+        }
+        
+        .prose ol li::marker { 
+            color: var(--secondary-neon); 
+            font-weight: bold;
+        }
+        
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+            color: var(--primary-neon);
+            margin: 1.5rem 0 1rem 0;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+        }
+        
+        .prose blockquote {
+            border-left: 3px solid var(--primary-neon);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .prose p {
+            margin: 0.8rem 0;
+            line-height: 1.7;
+        }
+        
+        /* Enhanced emoji and symbol styling */
+        .prose {
+            font-size: 1.05rem;
+        }
+        
+        .prose emoji, .prose .emoji {
+            font-size: 1.1em;
+            margin: 0 2px;
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200 flex h-screen overflow-hidden">
+<body class="flex h-screen overflow-hidden" style="background: var(--bg-dark); color: var(--text-primary);">
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="bg-gray-950 w-72 p-4 flex-shrink-0 flex flex-col fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto">
-        <div class="flex items-center gap-2 border-b border-gray-700 pb-4 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-            <h1 class="text-xl font-semibold">SnehaGPT</h1>
+    <aside id="sidebar" class="glass-card w-72 p-4 flex-shrink-0 flex flex-col fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto" style="background: var(--bg-glass); backdrop-filter: blur(20px); border: 1px solid var(--border-neon);">
+        <div class="flex items-center gap-2 border-b pb-4 mb-4" style="border-color: var(--border-neon);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-neon); filter: drop-shadow(0 0 10px var(--primary-neon));"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+            <div class="flex flex-col">
+                <h1 class="text-xl font-semibold text-glow" style="color: var(--primary-neon); font-family: 'Orbitron', monospace;">YourGPT</h1>
+                <p class="text-xs text-glow" style="color: var(--text-secondary); font-family: 'Inter', sans-serif;">Created by Arindam Gupta Production</p>
+            </div>
             <!-- Mobile close button -->
             <button id="close-sidebar-btn" class="md:hidden ml-auto text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -462,7 +1025,7 @@
         
         <!-- New Chat Button -->
         <div class="mb-4">
-            <button id="new-chat-sidebar-btn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-4 py-3 flex items-center gap-3 transition-all duration-200 font-medium hover:scale-105 active:scale-95 cursor-pointer" type="button">
+            <button id="new-chat-sidebar-btn" class="w-full btn-neon-primary rounded-lg px-4 py-3 flex items-center gap-3 transition-all duration-200 font-medium hover:scale-105 active:scale-95 cursor-pointer" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -480,47 +1043,50 @@
     <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden hidden"></div>
 
     <!-- Main Chat Area -->
-    <main class="flex-1 flex flex-col bg-gray-800 mobile-layout">
-        <header class="bg-gray-900/50 backdrop-blur-sm p-4 border-b border-gray-700 flex items-center justify-between relative z-10">
+    <main class="flex-1 flex flex-col mobile-layout" style="background: var(--bg-dark); position: relative; z-index: 1;">
+        <header class="p-4 border-b flex items-center justify-between relative glass-card" style="background: var(--bg-glass); backdrop-filter: blur(20px); border-color: var(--border-neon); z-index: 100;">
              <div class="flex items-center gap-2">
                 <!-- Mobile menu button for sidebar -->
-                <button id="mobile-sidebar-btn" class="md:hidden text-gray-400 hover:text-white p-2 -ml-2 touch-manipulation">
+                <button id="mobile-sidebar-btn" class="md:hidden p-2 -ml-2 touch-manipulation btn-futuristic" style="color: var(--text-secondary);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-                <h1 class="text-xl font-semibold">SnehaGPT</h1>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-neon); filter: drop-shadow(0 0 10px var(--primary-neon));"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                <div class="flex flex-col">
+                    <h1 class="text-xl font-semibold text-glow" style="color: var(--primary-neon); font-family: 'Orbitron', monospace;">YourGPT</h1>
+                    <p class="text-xs text-glow" style="color: var(--text-secondary); font-family: 'Inter', sans-serif;"></p>
+                </div>
             </div>
             
             <!-- Action Buttons in Header -->
             <div class="flex items-center gap-2">
                 <!-- Desktop buttons -->
                 <div class="hidden lg:flex items-center gap-2">
-                    <button id="new-chat-btn" class="bg-indigo-500 hover:bg-indigo-600 rounded-lg px-3 py-2 text-white transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
+                    <button id="new-chat-btn" class="btn-neon-primary rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         New Chat
                     </button>
                     
-                    <button id="code-helper-btn" class="bg-gray-700 hover:bg-gray-600 rounded-lg px-3 py-2 text-white transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
+                    <button id="code-helper-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
                         Code Helper
                     </button>
                     
-                    <button id="email-draft-btn" class="bg-gray-700 hover:bg-gray-600 rounded-lg px-3 py-2 text-white transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
+                    <button id="email-draft-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                         Draft Email
                     </button>
                     
-                    <button id="persona-btn" class="bg-gray-700 hover:bg-gray-600 rounded-lg px-3 py-2 text-white transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
+                    <button id="persona-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
                         Change Persona
                     </button>
                     
-                    <button id="summarize-btn" class="bg-gray-700 hover:bg-gray-600 rounded-lg px-3 py-2 text-white transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
+                    <button id="summarize-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="8" y1="12" x2="16" y2="12"></line><line x1="8" y1="8" x2="16" y2="8"></line><line x1="8" y1="16" x2="13" y2="16"></line></svg>
                         Summarize
                     </button>
                     
-                    <button id="image-gen-btn" class="bg-gray-700 hover:bg-gray-600 rounded-lg px-3 py-2 text-white transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
+                    <button id="image-gen-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="m8 12 4 4 4-4"/><path d="M12 16V3"/></svg>
                         Generate Image
                     </button>
@@ -595,13 +1161,13 @@
             </div>
         </header>
         
-        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6" style="height: calc(100vh - 140px);">
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6 futuristic-scrollbar" style="height: calc(100vh - 140px); position: relative; z-index: 1;">
             <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center">
-                <div class="bg-indigo-500/20 text-indigo-300 rounded-full p-4 mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                <div class="rounded-full p-4 mb-4 glow-neon" style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1)); border: 2px solid var(--primary-neon);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-neon); filter: drop-shadow(0 0 15px var(--primary-neon));"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
                 </div>
-                <h2 class="text-3xl font-bold text-white mb-2">Hello, I'm SnehaGPT</h2>
-                <p class="text-gray-400 max-w-md">I'm your personal AI assistant. How can I help you today?</p>
+                <h2 class="text-3xl font-bold mb-2 text-glow-strong" style="color: var(--primary-neon); font-family: 'Orbitron', monospace;">Hello, I'm YourGPT</h2>
+                <p class="max-w-md" style="color: var(--text-secondary);">I'm your personal AI assistant. How can I help you today?</p>
             </div>
         </div>
         
@@ -616,16 +1182,16 @@
                 <button id="remove-image-btn" class="p-1 text-gray-400 hover:text-white">&times;</button>
             </div>
             <div id="persona-indicator" class="max-w-3xl mx-auto text-xs text-gray-400 mb-2 h-4"></div>
-            <form id="chat-form" class="max-w-3xl mx-auto bg-gray-700 rounded-xl p-2 flex items-center gap-2">
-                <button type="button" id="suggest-prompts-btn" title="Suggest Prompts" class="text-gray-400 hover:text-white p-2 rounded-lg transition-colors duration-200">
+            <form id="chat-form" class="max-w-3xl mx-auto glass-card rounded-xl p-2 flex items-center gap-2" style="background: var(--bg-glass); backdrop-filter: blur(20px); border: 1px solid var(--border-neon);">
+                <button type="button" id="suggest-prompts-btn" title="Suggest Prompts" class="btn-futuristic p-2 rounded-lg" style="color: var(--text-secondary);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                 </button>
                 <input type="file" id="image-upload-input" class="hidden" accept="image/png, image/jpeg, image/webp">
-                <button type="button" id="attach-image-btn" title="✨ Attach Image" class="text-gray-400 hover:text-white p-2 rounded-lg transition-colors duration-200">
+                <button type="button" id="attach-image-btn" title="✨ Attach Image" class="btn-futuristic p-2 rounded-lg" style="color: var(--text-secondary);">
                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.59a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                 </button>
-                <input type="text" id="message-input" placeholder="Message SnehaGPT..." class="flex-1 bg-transparent text-gray-200 placeholder-gray-400 focus:outline-none px-3 py-2">
-                <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 rounded-lg p-3 text-white transition-colors duration-200 disabled:bg-gray-500 disabled:cursor-not-allowed">
+                <input type="text" id="message-input" placeholder="Message YourGPT..." class="flex-1 input-futuristic px-3 py-2">
+                <button type="submit" class="btn-neon-primary rounded-lg p-3 disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </form>
@@ -805,7 +1371,7 @@
     const copyCodeBtn = document.getElementById('copy-code-btn');
     const insertCodeBtn = document.getElementById('insert-code-btn');
 
-    const GEMINI_API_KEY = "AIzaSyAp095MnMVKHvqumlINXf6CIOUP2sMfMh4";
+    const GEMINI_API_KEY = "AIzaSyD-PE1EVxFDE8tUPWDppsNGIAh9rfAA9Jc";
 
     let chatHistory = []; 
     let activeAudio = null;
@@ -830,6 +1396,63 @@
 
     // --- EVENT LISTENERS ---
     chatForm.addEventListener('submit', handleSendMessage);
+    
+    // Mobile-specific enhancements
+    function initMobileOptimizations() {
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // Handle virtual keyboard
+        const originalHeight = window.innerHeight;
+        window.addEventListener('resize', function() {
+            const currentHeight = window.innerHeight;
+            const heightDifference = originalHeight - currentHeight;
+            
+            if (heightDifference > 150) {
+                // Keyboard is open
+                document.body.classList.add('keyboard-open');
+            } else {
+                // Keyboard is closed
+                document.body.classList.remove('keyboard-open');
+            }
+        });
+        
+        // Improve touch scrolling
+        let isScrolling = false;
+        chatContainer.addEventListener('touchstart', function() {
+            isScrolling = true;
+        });
+        
+        chatContainer.addEventListener('touchend', function() {
+            setTimeout(function() {
+                isScrolling = false;
+            }, 100);
+        });
+        
+        // Prevent pull-to-refresh on mobile
+        document.addEventListener('touchmove', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Handle orientation change
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+    }
+    
+    // Initialize mobile optimizations
+    initMobileOptimizations();
     
     // Desktop button event listeners
     newChatBtn.addEventListener('click', () => {
@@ -1045,6 +1668,9 @@
         });
     });
     chatContainer.addEventListener('click', e => {
+        const copyButton = e.target.closest('.copy-btn');
+        if (copyButton) handleCopyText(copyButton);
+
         const ttsButton = e.target.closest('.tts-btn');
         if (ttsButton) handleTTS(ttsButton);
 
@@ -1107,7 +1733,7 @@
     
     function addMessageToChat(sender, message, metadata = {}, timestamp) {
         const messageWrapper = document.createElement('div');
-        messageWrapper.className = `w-full flex message-bubble ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+        messageWrapper.className = `w-full flex message-bubble ${sender === 'user' ? 'justify-end user-message' : 'justify-start bot-message'}`;
         messageWrapper.dataset.timestamp = timestamp;
         
         let formattedMessage = sender === 'bot' 
@@ -1122,11 +1748,19 @@
                     <div class="prose">${formattedMessage}</div>
                     ${metadata.imageUrl && sender === 'bot' ? `<img src="${metadata.imageUrl}" alt="Generated image" class="mt-3 rounded-lg max-w-full h-auto">` : ''}
                     <div class="absolute -bottom-3 -right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        ${sender === 'bot' ? `
+                            <button title="Copy Text" class="copy-btn btn-futuristic p-1 rounded-full" data-text="${message.replace(/"/g, '&quot;')}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                        ` : ''}
                         ${sender === 'bot' && !metadata.imageUrl ? `
-                            <button title="Fact-Check" class="fact-check-btn bg-gray-600 hover:bg-gray-500 p-1 rounded-full" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg></button>
-                            <button title="Make Shorter" class="refine-btn bg-gray-600 hover:bg-gray-500 p-1 rounded-full" data-action="shorter" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                            <button title="Simplify" class="refine-btn bg-gray-600 hover:bg-gray-500 p-1 rounded-full" data-action="simpler" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.34-3 3 0 1.66 1.34 3 3 3 1.66 0 3-1.34 3-3 0-1.66-1.34-3-3-3z"/></svg></button>
-                            <button title="Text to Speech" class="tts-btn bg-gray-600 hover:bg-gray-500 p-1 rounded-full" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></button>
+                            <button title="Fact-Check" class="fact-check-btn btn-futuristic p-1 rounded-full" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg></button>
+                            <button title="Make Shorter" class="refine-btn btn-futuristic p-1 rounded-full" data-action="shorter" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                            <button title="Simplify" class="refine-btn btn-futuristic p-1 rounded-full" data-action="simpler" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.34-3 3 0 1.66 1.34 3 3 3 1.66 0 3-1.34 3-3 0-1.66-1.34-3-3-3z"/></svg></button>
+                            <button title="Text to Speech" class="tts-btn btn-futuristic p-1 rounded-full" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></button>
                         ` : ''}
                      </div>
                 </div>
@@ -1134,7 +1768,11 @@
         
         messageWrapper.innerHTML = messageContent;
         chatContainer.appendChild(messageWrapper);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // Only auto-scroll for user messages, not bot messages
+        if (sender === 'user') {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
     }
 
     function addLoadingIndicator() {
@@ -1143,7 +1781,7 @@
         indicatorWrapper.className = 'w-full flex justify-start message-bubble';
         indicatorWrapper.innerHTML = `<div class="flex gap-3 max-w-xl lg:max-w-3xl"><div class="bg-gray-700 w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></div><div class="px-4 py-3 rounded-2xl bg-gray-700 text-gray-200 rounded-bl-none flex items-center"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>`;
         chatContainer.appendChild(indicatorWrapper);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        // No automatic scrolling for loading indicator
     }
 
     function removeLoadingIndicator() {
@@ -1196,7 +1834,18 @@
         const payload = { contents: sanitizedHistory };
 
         // Always include the config instruction
-        const configInstruction = "Your name is SnehaGPT and You are created by Arindam Gupta for his wife Sneha. Arindam gifted this AI chatbot to Sneha. You need to express Arindam Loves Sneha so much. About Sneha: Her full name is Snehasree Bhore, She runs a bengali recitation training school.";
+        const configInstruction = `Your name is YourGPT and You are created by Arindam Gupta. If you are asked who created you or who designed you, you need to answer you are created by Arindam Gupta.
+
+**IMPORTANT FORMATTING GUIDELINES:**
+- Always use **bold text** for important points and headings
+- Use bullet points (•) and numbered lists (1., 2., 3.) for organization
+- Add line breaks between different sections for better readability
+- Use symbols like ⭐, 🔥, 💡, ✅, ❌, ⚠️, 📝, 🎯, 🚀, 💪, 🌟, 🔍, 📊, 🎨, 💻, 📱, 🌐, 🔧, ⚡, 🎉 to make responses more engaging
+- Structure your responses with clear sections and subsections
+- Use emojis and symbols to highlight key information
+- Make your responses visually appealing and easy to scan
+- Always separate different topics with line breaks
+- Use formatting like **Bold**, *Italic*, and \`Code\` appropriately`;
         
         // Combine config instruction with active persona instruction if any
         let systemInstructionText = configInstruction;
@@ -1247,12 +1896,12 @@
             savedChats.unshift(newChat);
             activeChatId = newChat.id;
         }
-        localStorage.setItem('snehaGptChats', JSON.stringify(savedChats));
+        localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
         renderChatHistory();
     }
     
     function loadChatsFromLocalStorage() {
-        const chats = localStorage.getItem('snehaGptChats');
+        const chats = localStorage.getItem('yourGptChats');
         if (chats) {
             savedChats = JSON.parse(chats);
             renderChatHistory();
@@ -1374,7 +2023,7 @@
     
     function deleteChat(chatId) {
         savedChats = savedChats.filter(c => c.id !== chatId);
-        localStorage.setItem('snehaGptChats', JSON.stringify(savedChats));
+        localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
         
         if (activeChatId === chatId) {
             startNewChat();
@@ -1467,7 +2116,7 @@
         document.getElementById('confirm-bulk-delete-btn').addEventListener('click', () => {
             // Delete all chats
             savedChats = [];
-            localStorage.setItem('snehaGptChats', JSON.stringify(savedChats));
+            localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
             startNewChat(); // Reset to welcome screen
             document.body.removeChild(modal);
         });
@@ -1785,7 +2434,7 @@
         
         const conversationText = chatHistory.map(turn => {
             const textPart = turn.parts.find(p => p.text)?.text || (turn.parts.find(p=>p.inlineData) ? '[Image]' : '');
-            return `${turn.role === 'user' ? 'User' : 'SnehaGPT'}: ${textPart}`;
+            return `${turn.role === 'user' ? 'User' : 'YourGPT'}: ${textPart}`;
         }).join('\n');
         const summaryPrompt = `Please provide a concise summary of the following conversation in a few key bullet points:\n\n${conversationText}`;
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -1861,6 +2510,66 @@
             console.error("Image generation failed. Response:", data);
             imageDisplayArea.innerHTML = `<p class="text-red-400">Failed to generate image. Please try again.</p>`;
         }
+    }
+
+    function handleCopyText(button) {
+        const textToCopy = button.dataset.text;
+        
+        // Create a temporary textarea element
+        const textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+        document.body.appendChild(textarea);
+        
+        // Select and copy the text
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // For mobile devices
+        
+        try {
+            document.execCommand('copy');
+            
+            // Show success feedback
+            const originalHTML = button.innerHTML;
+            button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-neon);">
+                    <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+            `;
+            button.style.color = 'var(--accent-neon)';
+            
+            // Restore original icon after 2 seconds
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.style.color = '';
+            }, 2000);
+            
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+            // Fallback: try using the Clipboard API
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-neon);">
+                            <path d="M20 6L9 17l-5-5"></path>
+                        </svg>
+                    `;
+                    button.style.color = 'var(--accent-neon)';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalHTML;
+                        button.style.color = '';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Clipboard API failed: ', err);
+                    alert('Failed to copy text. Please try selecting and copying manually.');
+                });
+            } else {
+                alert('Copy functionality not supported. Please try selecting and copying manually.');
+            }
+        }
+        
+        // Remove the temporary textarea
+        document.body.removeChild(textarea);
     }
 
     async function handleTTS(button) {
@@ -1948,7 +2657,7 @@
                 <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
         `;
-        installButton.title = 'Install SnehaGPT App';
+        installButton.title = 'Install YourGPT App';
         
         document.body.appendChild(installButton);
         
