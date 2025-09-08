@@ -3725,14 +3725,26 @@
     // Desktop auth buttons
     if (signInBtn) signInBtn.addEventListener('click', () => document.getElementById('sign-in-modal').classList.add('active'));
     if (signUpBtn) signUpBtn.addEventListener('click', () => document.getElementById('sign-up-modal').classList.add('active'));
-    if (profileBtn) profileBtn.addEventListener('click', () => document.getElementById('profile-modal').classList.add('active'));
-    if (customizeBtn) customizeBtn.addEventListener('click', () => document.getElementById('customize-modal').classList.add('active'));
+    if (profileBtn) profileBtn.addEventListener('click', () => {
+        loadProfileData();
+        document.getElementById('profile-modal').classList.add('active');
+    });
+    if (customizeBtn) customizeBtn.addEventListener('click', () => {
+        loadCustomizeData();
+        document.getElementById('customize-modal').classList.add('active');
+    });
     
     // Medium screen auth buttons
     if (signInBtnMd) signInBtnMd.addEventListener('click', () => document.getElementById('sign-in-modal').classList.add('active'));
     if (signUpBtnMd) signUpBtnMd.addEventListener('click', () => document.getElementById('sign-up-modal').classList.add('active'));
-    if (profileBtnMd) profileBtnMd.addEventListener('click', () => document.getElementById('profile-modal').classList.add('active'));
-    if (customizeBtnMd) customizeBtnMd.addEventListener('click', () => document.getElementById('customize-modal').classList.add('active'));
+    if (profileBtnMd) profileBtnMd.addEventListener('click', () => {
+        loadProfileData();
+        document.getElementById('profile-modal').classList.add('active');
+    });
+    if (customizeBtnMd) customizeBtnMd.addEventListener('click', () => {
+        loadCustomizeData();
+        document.getElementById('customize-modal').classList.add('active');
+    });
     
     // Mobile auth buttons
     if (signInBtnMobile) signInBtnMobile.addEventListener('click', () => {
@@ -3744,10 +3756,12 @@
         mobileMenu.classList.add('hidden');
     });
     if (profileBtnMobile) profileBtnMobile.addEventListener('click', () => {
+        loadProfileData();
         document.getElementById('profile-modal').classList.add('active');
         mobileMenu.classList.add('hidden');
     });
     if (customizeBtnMobile) customizeBtnMobile.addEventListener('click', () => {
+        loadCustomizeData();
         document.getElementById('customize-modal').classList.add('active');
         mobileMenu.classList.add('hidden');
     });
@@ -3978,6 +3992,70 @@
         } else {
             console.log('Sign-in modal not found!');
         }
+    };
+    
+    // Global function to test chat deletion
+    window.testChatDeletion = function(chatId) {
+        console.log('=== Testing Chat Deletion ===');
+        console.log('Current user:', currentUser ? currentUser.id : 'Not logged in');
+        console.log('Current savedChats:', savedChats.length);
+        console.log('Chat to delete:', chatId);
+        
+        if (!currentUser) {
+            console.log('User not logged in, cannot test Supabase deletion');
+            return;
+        }
+        
+        if (!chatId) {
+            console.log('No chatId provided, using first available chat');
+            if (savedChats.length > 0) {
+                chatId = savedChats[0].id;
+                console.log('Using chat ID:', chatId);
+            } else {
+                console.log('No chats available to delete');
+                return;
+            }
+        }
+        
+        console.log('Testing deletion of chat:', chatId);
+        chatHistoryManager.deleteChat(chatId).then(success => {
+            console.log('Deletion result:', success);
+            console.log('Remaining chats:', savedChats.length);
+        }).catch(error => {
+            console.error('Deletion error:', error);
+        });
+    };
+    
+    // Global function to test profile and customize modals
+    window.testProfileCustomize = function() {
+        console.log('=== Testing Profile and Customize Modals ===');
+        console.log('Current user:', currentUser);
+        
+        if (!currentUser) {
+            console.log('User not logged in, cannot test profile/customize');
+            return;
+        }
+        
+        console.log('User metadata:', currentUser.user_metadata);
+        console.log('User email:', currentUser.email);
+        
+        // Test profile data loading
+        console.log('Testing profile data loading...');
+        loadProfileData();
+        
+        // Test customize data loading
+        console.log('Testing customize data loading...');
+        loadCustomizeData();
+        
+        // Open profile modal for testing
+        console.log('Opening profile modal...');
+        document.getElementById('profile-modal').classList.add('active');
+        
+        setTimeout(() => {
+            console.log('Closing profile modal and opening customize modal...');
+            document.getElementById('profile-modal').classList.remove('active');
+            document.getElementById('customize-modal').classList.add('active');
+        }, 2000);
     };
     
     // Close sidebar function
@@ -4695,15 +4773,36 @@
         });
     }
     
+    // Function to load profile data
+    function loadProfileData() {
+        console.log('Loading profile data for user:', currentUser);
+        if (currentUser) {
+            const fullName = currentUser.user_metadata?.full_name || 'User';
+            const email = currentUser.email || '';
+            
+            console.log('Profile data - Name:', fullName, 'Email:', email);
+            
+            // Update display elements
+            const profileNameEl = document.getElementById('profile-name');
+            const profileEmailEl = document.getElementById('profile-email');
+            const profileNameInput = document.getElementById('profile-name-input');
+            const profileEmailInput = document.getElementById('profile-email-input');
+            
+            if (profileNameEl) profileNameEl.textContent = fullName;
+            if (profileEmailEl) profileEmailEl.textContent = email;
+            if (profileNameInput) profileNameInput.value = fullName;
+            if (profileEmailInput) profileEmailInput.value = email;
+            
+            console.log('Profile data loaded successfully');
+        } else {
+            console.log('No current user found for profile data');
+        }
+    }
+    
     // Load profile data when modal opens
     document.getElementById('profile-modal').addEventListener('click', (e) => {
         if (e.target.id === 'profile-modal' || e.target.classList.contains('close-modal-btn')) {
-            if (currentUser) {
-                document.getElementById('profile-name').textContent = currentUser.user_metadata?.full_name || 'User';
-                document.getElementById('profile-email').textContent = currentUser.email;
-                document.getElementById('profile-name-input').value = currentUser.user_metadata?.full_name || '';
-                document.getElementById('profile-email-input').value = currentUser.email;
-            }
+            // This was the old logic - now we load data when opening, not closing
         }
     });
     
@@ -4796,22 +4895,34 @@
         });
     }
     
+    // Function to load customize data
+    function loadCustomizeData() {
+        console.log('Loading customize data for user:', currentUser);
+        if (currentUser && customInstructionsInput) {
+            const instructions = currentUser.user_metadata?.custom_instructions || '';
+            console.log('Custom instructions:', instructions);
+            
+            customInstructionsInput.value = instructions;
+            const count = instructions.length;
+            charCount.textContent = `${count}/2000 characters`;
+            if (count > 2000) {
+                charCount.classList.add('text-red-500');
+                charCount.classList.remove('text-gray-500');
+            } else {
+                charCount.classList.remove('text-red-500');
+                charCount.classList.add('text-gray-500');
+            }
+            
+            console.log('Customize data loaded successfully');
+        } else {
+            console.log('No current user or custom instructions input found');
+        }
+    }
+    
     // Load custom instructions when modal opens
     document.getElementById('customize-modal').addEventListener('click', (e) => {
         if (e.target.id === 'customize-modal' || e.target.classList.contains('close-modal-btn')) {
-            if (currentUser && customInstructionsInput) {
-                const instructions = currentUser.user_metadata?.custom_instructions || '';
-                customInstructionsInput.value = instructions;
-                const count = instructions.length;
-                charCount.textContent = `${count}/2000 characters`;
-                if (count > 2000) {
-                    charCount.classList.add('text-red-500');
-                    charCount.classList.remove('text-gray-500');
-                } else {
-                    charCount.classList.remove('text-red-500');
-                    charCount.classList.add('text-gray-500');
-                }
-            }
+            // This was the old logic - now we load data when opening, not closing
         }
     });
     
@@ -5448,20 +5559,30 @@
                 // Delete from Supabase
                 const success = await deleteChatFromSupabase(chatId);
                 if (success) {
+                    console.log('ChatHistoryManager: Successfully deleted from Supabase, reloading chats...');
                     // Reload chats from Supabase to update local array
                     await loadUserChats();
+                    console.log('ChatHistoryManager: Reloaded chats, current savedChats length:', savedChats.length);
+                } else {
+                    console.error('ChatHistoryManager: Failed to delete from Supabase');
+                    return false;
                 }
             } else {
                 // Delete from localStorage
                 savedChats = savedChats.filter(c => c.id !== chatId);
                 this.saveToLocalStorage();
+                console.log('ChatHistoryManager: Deleted from localStorage, current savedChats length:', savedChats.length);
             }
             
             if (activeChatId === chatId) {
+                console.log('ChatHistoryManager: Deleted active chat, starting new chat');
                 startNewChat();
             } else {
+                console.log('ChatHistoryManager: Re-rendering chat history');
                 this.render();
             }
+            
+            return true;
         }
 
         clearAllChats() {
@@ -7154,7 +7275,12 @@
     }
 
     async function loadUserChats() {
-        if (!currentUser) return;
+        if (!currentUser) {
+            console.log('loadUserChats: No current user, cannot load chats');
+            return;
+        }
+        
+        console.log('loadUserChats: Loading chats for user', currentUser.id);
         
         try {
             const { data, error } = await supabase
@@ -7163,7 +7289,12 @@
                 .eq('user_id', currentUser.id)
                 .order('updated_at', { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                console.error('loadUserChats: Supabase error:', error);
+                throw error;
+            }
+            
+            console.log('loadUserChats: Raw data from Supabase:', data);
             
             // Convert Supabase data to our chat format
             savedChats = data.map(chat => ({
@@ -7174,31 +7305,46 @@
                 timestamp: new Date(chat.updated_at).getTime()
             }));
             
+            console.log('loadUserChats: Converted savedChats:', savedChats);
+            
             if (savedChats.length === 0) {
+                console.log('loadUserChats: No chats found, welcome screen will be shown');
                 // Welcome screen will be shown by main initialization
             } else {
+                console.log('loadUserChats: Found', savedChats.length, 'chats, rendering history');
                 renderChatHistory();
             }
         } catch (error) {
-            console.error('Error loading user chats:', error);
+            console.error('loadUserChats: Error loading user chats:', error);
             // Welcome screen will be shown by main initialization
         }
     }
 
     async function deleteChatFromSupabase(chatId) {
-        if (!currentUser) return false;
+        if (!currentUser) {
+            console.log('deleteChatFromSupabase: No current user, cannot delete');
+            return false;
+        }
+        
+        console.log('deleteChatFromSupabase: Deleting chat', chatId, 'for user', currentUser.id);
         
         try {
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('chats')
                 .delete()
                 .eq('id', chatId)
-                .eq('user_id', currentUser.id);
+                .eq('user_id', currentUser.id)
+                .select();
 
-            if (error) throw error;
+            if (error) {
+                console.error('deleteChatFromSupabase: Supabase error:', error);
+                throw error;
+            }
+            
+            console.log('deleteChatFromSupabase: Successfully deleted chat:', data);
             return true;
         } catch (error) {
-            console.error('Error deleting chat from Supabase:', error);
+            console.error('deleteChatFromSupabase: Error deleting chat from Supabase:', error);
             return false;
         }
     }
