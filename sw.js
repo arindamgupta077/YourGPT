@@ -1,4 +1,16 @@
-const CACHE_NAME = 'yourgpt-v1.0.0';
+// Development mode detection
+const isDevelopment = self.location.hostname === 'localhost' || 
+                     self.location.hostname === '127.0.0.1' || 
+                     self.location.hostname.includes('local') ||
+                     self.location.port === '3000' ||
+                     self.location.port === '8080' ||
+                     self.location.port === '5000';
+
+// Use timestamp for cache name in development to force cache updates
+const CACHE_NAME = isDevelopment ? 
+  `yourgpt-dev-${Date.now()}` : 
+  'yourgpt-v1.0.0';
+
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,6 +18,9 @@ const urlsToCache = [
   'https://cdn.jsdelivr.net/npm/marked/marked.min.js',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
 ];
+
+console.log(`Service Worker starting in ${isDevelopment ? 'DEVELOPMENT' : 'PRODUCTION'} mode`);
+console.log(`Cache name: ${CACHE_NAME}`);
 
 // Install event - cache resources
 self.addEventListener('install', (event) => {
@@ -61,52 +76,63 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
+    (async () => {
+      // In development mode, always fetch from network first
+      if (isDevelopment) {
+        try {
+          const networkResponse = await fetch(event.request);
+          if (networkResponse && networkResponse.status === 200) {
+            console.log(`🔄 Dev mode: Fetched ${event.request.url} from network`);
+            return networkResponse;
+          }
+        } catch (error) {
+          console.log(`🌐 Dev mode: Network fetch failed for ${event.request.url}:`, error);
+        }
+      }
+      
+      // Try cache first (production mode or network failed in dev)
+      const cachedResponse = await caches.match(event.request);
+      if (cachedResponse && !isDevelopment) {
+        console.log(`📦 Cache hit: ${event.request.url}`);
+        return cachedResponse;
+      }
+      
+      // Fetch from network
+      try {
+        const networkResponse = await fetch(event.request);
+        
+        // Check if we received a valid response
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse;
         }
         
-        // Clone the request because it's a stream
-        const fetchRequest = event.request.clone();
+        // Cache the response (but not in development mode for main files)
+        if (!isDevelopment || !event.request.url.includes('index.html')) {
+          const responseToCache = networkResponse.clone();
+          try {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(event.request, responseToCache);
+            console.log(`💾 Cached: ${event.request.url}`);
+          } catch (error) {
+            console.log('Cache put failed:', error);
+          }
+        }
         
-        return fetch(fetchRequest).then((response) => {
-          // Check if we received a valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
+        return networkResponse;
+      } catch (error) {
+        console.log('Fetch failed:', error);
+        
+        // If both cache and network fail, show offline page
+        if (event.request.destination === 'document') {
+          const offlineResponse = await caches.match('/index.html');
+          if (offlineResponse) {
+            return offlineResponse;
           }
-          
-          // Clone the response because it's a stream
-          const responseToCache = response.clone();
-          
-          // Only cache successful responses
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              try {
-                cache.put(event.request, responseToCache);
-              } catch (error) {
-                console.log('Cache put failed:', error);
-              }
-            })
-            .catch((error) => {
-              console.log('Cache open failed:', error);
-            });
-          
-          return response;
-        }).catch((error) => {
-          console.log('Fetch failed:', error);
-          // If both cache and network fail, show offline page
-          if (event.request.destination === 'document') {
-            return caches.match('/index.html');
-          }
-        });
-      })
-      .catch((error) => {
-        console.log('Cache match failed:', error);
-        // Fallback to network request
-        return fetch(event.request);
-      })
+        }
+        
+        throw error;
+      }
+    })()
   );
 });
 

@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>YourGPT</title>
     
+    <!-- Cache busting and development mode -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#1f2937">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,6 +28,120 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Development Mode and Cache Busting -->
+    <script>
+        // Development mode detection
+        const isDevelopment = window.location.hostname === 'localhost' || 
+                             window.location.hostname === '127.0.0.1' || 
+                             window.location.hostname.includes('local') ||
+                             window.location.port === '3000' ||
+                             window.location.port === '8080' ||
+                             window.location.port === '5000';
+        
+        // Cache busting for development
+        if (isDevelopment) {
+            console.log('🚀 Development mode detected - enabling cache busting');
+            
+            // Add timestamp to prevent caching
+            const timestamp = Date.now();
+            document.title = `YourGPT (Dev ${timestamp})`;
+            
+            // Force reload on focus (useful during development)
+            let lastReload = Date.now();
+            window.addEventListener('focus', () => {
+                const now = Date.now();
+                if (now - lastReload > 5000) { // Only reload if more than 5 seconds have passed
+                    console.log('🔄 Page focused - checking for updates...');
+                    lastReload = now;
+                }
+            });
+            
+            // Add cache busting to service worker registration
+            window.addEventListener('load', () => {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        registrations.forEach(registration => {
+                            console.log('🗑️ Unregistering service worker for development');
+                            registration.unregister();
+                        });
+                    });
+                }
+            });
+        }
+        
+        // Global development utilities
+        window.devUtils = {
+            clearCache: () => {
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => {
+                            caches.delete(name);
+                        });
+                        console.log('🧹 All caches cleared');
+                    });
+                }
+            },
+            forceReload: () => {
+                window.location.reload(true);
+            },
+            isDev: isDevelopment,
+            // Hot reload for development
+            enableHotReload: () => {
+                if (!isDevelopment) return;
+                
+                let lastModified = Date.now();
+                const checkForUpdates = async () => {
+                    try {
+                        const response = await fetch(`/?t=${Date.now()}`, {
+                            method: 'HEAD',
+                            cache: 'no-cache'
+                        });
+                        
+                        const lastModifiedHeader = response.headers.get('last-modified');
+                        if (lastModifiedHeader) {
+                            const serverTime = new Date(lastModifiedHeader).getTime();
+                            if (serverTime > lastModified) {
+                                console.log('🔄 File updated, reloading...');
+                                window.location.reload();
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Hot reload check failed:', error);
+                    }
+                };
+                
+                // Check for updates every 2 seconds in development
+                setInterval(checkForUpdates, 2000);
+                console.log('🔥 Hot reload enabled');
+            }
+        };
+        
+        // Auto-enable hot reload in development
+        if (isDevelopment) {
+            window.devUtils.enableHotReload();
+        }
+        
+        // Keyboard shortcuts for development
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Shift+R or Cmd+Shift+R: Force reload with cache clear
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+                e.preventDefault();
+                console.log('🔄 Force reloading with cache clear...');
+                window.devUtils.clearCache();
+                setTimeout(() => {
+                    window.location.reload(true);
+                }, 100);
+            }
+            
+            // Ctrl+Shift+C or Cmd+Shift+C: Clear cache only
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                console.log('🧹 Clearing cache...');
+                window.devUtils.clearCache();
+            }
+        });
+    </script>
     <style>
         /* Simple welcome screen styles */
         #welcome-screen {
@@ -166,27 +285,27 @@
             }
             
         /* Mobile input area - Enhanced alignment */
-        #chat-form {
-            flex-shrink: 0;
-            margin: 0 0.75rem 0.75rem 0.75rem;
-            padding: 0.75rem;
-            border-radius: 20px;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-neon);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            #chat-form {
+                flex-shrink: 0;
+                margin: 0 0.75rem 0.75rem 0.75rem;
+                padding: 0.75rem;
+                border-radius: 20px;
+                background: var(--bg-glass);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--border-neon);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             position: relative;
             display: flex;
             align-items: center;
             gap: 8px;
             min-height: 60px;
-        }
+            }
             
-        /* Mobile welcome screen */
-        #welcome-screen {
-            height: calc(100vh - 200px);
-            height: calc(100dvh - 200px);
-            padding: 1.5rem 0.75rem;
+            /* Mobile welcome screen */
+            #welcome-screen {
+                height: calc(100vh - 200px);
+                height: calc(100dvh - 200px);
+                padding: 1.5rem 0.75rem;
             display: flex !important;
             flex-direction: column;
             align-items: center;
@@ -198,7 +317,7 @@
             z-index: 10;
             width: 100%;
             min-height: 400px;
-        }
+            }
             
             /* Mobile modals */
             .modal-content {
@@ -1027,7 +1146,7 @@
                 min-height: 44px;
                 display: flex;
                 align-items: center;
-                justify-content: center;
+                justify-content: flex-start;
                 z-index: 200 !important;
                 position: relative;
                 background-color: rgba(0, 0, 0, 0.1);
@@ -1036,56 +1155,558 @@
                 transition: all 0.2s ease;
             }
             
-            /* Mobile close sidebar button styling */
-            #close-sidebar-btn {
-                min-width: 44px;
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background-color: rgba(0, 0, 0, 0.1);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(4px);
-                border-radius: 8px;
-                transition: all 0.2s ease;
-                position: relative;
-                z-index: 10;
-                pointer-events: auto;
-                cursor: pointer;
-            }
             
-            #close-sidebar-btn:hover {
-                background-color: rgba(255, 0, 0, 0.1);
-                border-color: rgba(255, 0, 0, 0.3);
-                color: #ff6b6b;
-            }
-            
-            #close-sidebar-btn:active {
-                transform: scale(0.95);
-            }
-            
-            /* Ensure close button is always clickable */
-            #close-sidebar-btn {
-                -webkit-tap-highlight-color: transparent;
-                -webkit-touch-callout: none;
-                -webkit-user-select: none;
-                user-select: none;
-                touch-action: manipulation;
-            }
-            
-            /* Make sure close button is visible on mobile */
-            @media (max-width: 768px) {
-                #close-sidebar-btn {
-                    display: flex !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                }
-            }
             
             /* Enhanced sidebar sliding animations */
             #sidebar {
                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
                 will-change: transform, opacity;
+            }
+
+            /* Premium Modal Animations */
+            .modal-overlay {
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
+
+            .modal-overlay.active {
+                opacity: 1 !important;
+                pointer-events: auto;
+            }
+
+            .modal-overlay.active .modal-content {
+                transform: scale(1) !important;
+                opacity: 1 !important;
+            }
+
+            .modal-content {
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                box-shadow: 
+                    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                    0 0 0 1px rgba(255, 255, 255, 0.05),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            /* Premium Input Animations */
+            .modal-content input {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+            }
+
+            .modal-content input:focus {
+                transform: translateY(-1px);
+                box-shadow: 
+                    0 10px 25px -5px rgba(59, 130, 246, 0.1),
+                    0 0 0 1px rgba(59, 130, 246, 0.3);
+            }
+
+            .modal-content input:hover:not(:focus) {
+                transform: translateY(-0.5px);
+                box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Premium Button Animations */
+            .modal-content button[type="submit"] {
+                position: relative;
+                overflow: hidden;
+                transform: translateZ(0);
+                backface-visibility: hidden;
+            }
+
+            .modal-content button[type="submit"]:active {
+                transform: scale(0.98) translateZ(0);
+            }
+
+            /* Loading Animation */
+            .modal-content button[type="submit"].loading {
+                pointer-events: none;
+            }
+
+            .modal-content button[type="submit"].loading::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 20px;
+                height: 20px;
+                margin: -10px 0 0 -10px;
+                border: 2px solid transparent;
+                border-top: 2px solid #ffffff;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            .modal-content button[type="submit"].loading span {
+                opacity: 0;
+            }
+
+            /* Form Validation Animations */
+            .modal-content input.error {
+                border-color: #ef4444 !important;
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+                animation: shake 0.5s ease-in-out;
+            }
+
+            .modal-content input.success {
+                border-color: #10b981 !important;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+            }
+
+            /* Shake Animation */
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+
+            /* Floating Label Animation */
+            .modal-content .group:focus-within label {
+                transform: translateY(-2px);
+                color: var(--primary-color, #3b82f6);
+            }
+
+            /* Icon Animation */
+            .modal-content .group:focus-within svg {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 8px currentColor);
+            }
+
+            /* Close Button Animation */
+            .close-modal-btn {
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .close-modal-btn:hover {
+                transform: rotate(90deg) scale(1.1);
+                background-color: rgba(239, 68, 68, 0.1);
+                color: #ef4444;
+            }
+
+            /* Link Hover Effects */
+            .modal-content button[id*="switch"], 
+            .modal-content button[id*="forgot"] {
+                position: relative;
+                transition: all 0.2s ease;
+            }
+
+            .modal-content button[id*="switch"]:hover, 
+            .modal-content button[id*="forgot"]:hover {
+                transform: translateY(-1px);
+            }
+
+            .modal-content button[id*="switch"]:hover::after, 
+            .modal-content button[id*="forgot"]:hover::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, currentColor, transparent);
+                animation: underline 0.3s ease forwards;
+            }
+
+            @keyframes underline {
+                from { width: 0; }
+                to { width: 100%; }
+            }
+
+            /* Gradient Text Animation */
+            .modal-content h3 {
+                background-size: 200% 200%;
+                animation: gradientShift 3s ease infinite;
+            }
+
+            @keyframes gradientShift {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
+
+            /* Header Icon Animation */
+            .modal-content .w-10.h-10 {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .modal-content .w-10.h-10:hover {
+                transform: rotate(5deg) scale(1.05);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Responsive Modal */
+            @media (max-width: 640px) {
+                .modal-content {
+                    margin: 1rem;
+                    max-height: calc(100vh - 2rem);
+                    overflow-y: auto;
+                }
+                
+                .modal-content .p-6 {
+                    padding: 1.5rem;
+                }
+            }
+
+            /* Fade In Animation */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .animate-fadeIn {
+                animation: fadeIn 0.3s ease-out;
+            }
+
+            /* Premium Welcome Screen Styles */
+            .premium-welcome-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                height: 100%;
+                text-align: center;
+                padding: 2rem;
+                padding-top: 8rem;
+                position: relative;
+                overflow: hidden;
+                background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.05) 0%, transparent 70%);
+            }
+
+            /* Animated Background Particles */
+            .welcome-particles {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .particle {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: linear-gradient(45deg, #00ffff, #ff00ff);
+                border-radius: 50%;
+                opacity: 0.6;
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .particle-1 { top: 20%; left: 10%; animation-delay: 0s; }
+            .particle-2 { top: 60%; left: 80%; animation-delay: 1s; }
+            .particle-3 { top: 30%; left: 70%; animation-delay: 2s; }
+            .particle-4 { top: 80%; left: 20%; animation-delay: 3s; }
+            .particle-5 { top: 10%; left: 50%; animation-delay: 4s; }
+            .particle-6 { top: 70%; left: 40%; animation-delay: 5s; }
+
+            /* Main Content */
+            .welcome-content {
+                position: relative;
+                z-index: 2;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            /* Premium Icon Container */
+            .icon-container {
+                position: relative;
+                margin-bottom: 3rem;
+                display: inline-block;
+            }
+
+            .icon-glow-ring {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 120px;
+                height: 120px;
+                border: 2px solid rgba(0, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: rotate 20s linear infinite;
+            }
+
+            .icon-pulse-ring {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 100px;
+                height: 100px;
+                border: 1px solid rgba(255, 0, 255, 0.4);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            .icon-main {
+                position: relative;
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+                border: 2px solid #00ffff;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                box-shadow: 
+                    0 0 30px rgba(0, 255, 255, 0.4),
+                    inset 0 0 20px rgba(255, 0, 255, 0.1);
+                animation: iconFloat 4s ease-in-out infinite;
+            }
+
+            .icon-svg {
+                color: #00ffff;
+                filter: drop-shadow(0 0 10px #00ffff);
+                animation: iconGlow 2s ease-in-out infinite alternate;
+            }
+
+            /* Premium Typography */
+            .text-container {
+                position: relative;
+                margin-bottom: 2rem;
+            }
+
+            .welcome-title {
+                font-family: 'Orbitron', monospace;
+                font-size: 3.5rem;
+                font-weight: 900;
+                margin: 0 0 1.5rem 0;
+                line-height: 1.1;
+                position: relative;
+            }
+
+            .title-line {
+                display: block;
+                background: linear-gradient(135deg, #00ffff, #ff00ff, #00ffff);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+                animation: gradientShift 3s ease infinite;
+            }
+
+            .title-line-1 {
+                animation-delay: 0s;
+                animation: slideInFromLeft 1s ease-out;
+            }
+
+            .title-line-2 {
+                animation-delay: 0.5s;
+                animation: slideInFromRight 1s ease-out 0.5s both;
+                font-size: 1.2em;
+                background: linear-gradient(135deg, #ff00ff, #00ffff, #ff00ff);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .subtitle-container {
+                position: relative;
+                margin-top: 2rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 1.4rem;
+                color: #b0b0b0;
+                line-height: 1.8;
+                max-width: 600px;
+                margin: 0 auto;
+                font-weight: 300;
+                letter-spacing: 0.5px;
+            }
+
+            .subtitle-word {
+                display: inline-block;
+                opacity: 0;
+                transform: translateY(20px);
+                animation: wordFadeIn 0.6s ease-out forwards;
+                margin-right: 0.3em;
+            }
+
+            .subtitle-word:nth-child(1) { animation-delay: 1.5s; }
+            .subtitle-word:nth-child(2) { animation-delay: 1.7s; }
+            .subtitle-word:nth-child(3) { animation-delay: 1.9s; }
+            .subtitle-word:nth-child(4) { animation-delay: 2.1s; }
+            .subtitle-word:nth-child(5) { animation-delay: 2.3s; }
+            .subtitle-word:nth-child(6) { animation-delay: 2.5s; }
+            .subtitle-word:nth-child(7) { animation-delay: 2.7s; }
+            .subtitle-word:nth-child(8) { animation-delay: 2.9s; }
+            .subtitle-word:nth-child(9) { animation-delay: 3.1s; }
+            .subtitle-word:nth-child(10) { animation-delay: 3.3s; }
+            .subtitle-word:nth-child(11) { animation-delay: 3.5s; }
+
+            /* Typing Cursor */
+            .typing-cursor {
+                display: inline-block;
+                width: 3px;
+                height: 1.4rem;
+                background: #00ffff;
+                margin-left: 2px;
+                animation: blink 1s infinite;
+                box-shadow: 0 0 10px #00ffff;
+            }
+
+            /* Floating Elements */
+            .floating-elements {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .floating-dot {
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                background: radial-gradient(circle, #00ffff, transparent);
+                border-radius: 50%;
+                opacity: 0.7;
+            }
+
+            .dot-1 {
+                top: 20%;
+                left: 15%;
+                animation: floatUp 8s ease-in-out infinite;
+            }
+
+            .dot-2 {
+                top: 60%;
+                right: 20%;
+                animation: floatUp 10s ease-in-out infinite 2s;
+            }
+
+            .dot-3 {
+                bottom: 30%;
+                left: 30%;
+                animation: floatUp 12s ease-in-out infinite 4s;
+            }
+
+            /* Keyframe Animations */
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-20px) rotate(180deg); }
+            }
+
+            @keyframes rotate {
+                from { transform: translate(-50%, -50%) rotate(0deg); }
+                to { transform: translate(-50%, -50%) rotate(360deg); }
+            }
+
+            @keyframes pulse {
+                0%, 100% { 
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: 0.4;
+                }
+                50% { 
+                    transform: translate(-50%, -50%) scale(1.2);
+                    opacity: 0.8;
+                }
+            }
+
+            @keyframes iconFloat {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+
+            @keyframes iconGlow {
+                0% { filter: drop-shadow(0 0 10px #00ffff); }
+                100% { filter: drop-shadow(0 0 20px #00ffff) drop-shadow(0 0 30px #ff00ff); }
+            }
+
+            @keyframes slideInFromLeft {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-100px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes slideInFromRight {
+                0% {
+                    opacity: 0;
+                    transform: translateX(100px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes wordFadeIn {
+                0% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0; }
+            }
+
+            @keyframes floatUp {
+                0%, 100% {
+                    transform: translateY(0px);
+                    opacity: 0.7;
+                }
+                50% {
+                    transform: translateY(-30px);
+                    opacity: 0.3;
+                }
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .welcome-title {
+                    font-size: 2.5rem;
+                }
+                
+                .welcome-subtitle {
+                    font-size: 1.2rem;
+                }
+                
+                .icon-main {
+                    width: 60px;
+                    height: 60px;
+                }
+                
+                .icon-svg {
+                    width: 40px;
+                    height: 40px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .welcome-title {
+                    font-size: 2rem;
+                }
+                
+                .welcome-subtitle {
+                    font-size: 1rem;
+                }
+                
+                .premium-welcome-container {
+                    padding: 1rem;
+                    padding-top: 4rem;
+                }
             }
             
             /* Smooth overlay transitions */
@@ -1511,10 +2132,6 @@
                 <h1 class="text-xl font-semibold text-glow" style="color: var(--primary-neon); font-family: 'Orbitron', monospace;">YourGPT</h1>
                 <p class="text-xs text-glow" style="color: var(--text-secondary); font-family: 'Inter', sans-serif;">Created by Arindam Gupta Production</p>
             </div>
-            <!-- Mobile close button -->
-            <button id="close-sidebar-btn" class="md:hidden ml-auto text-gray-400 hover:text-white p-2 rounded-lg transition-all duration-200" style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
         </div>
         
         <!-- Swipe hint for mobile -->
@@ -1595,11 +2212,17 @@
                         <button id="sign-up-btn" class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                             Sign Up
-                        </button>
+                    </button>
                     </div>
                     
                     <!-- User Profile (hidden by default) -->
                     <div id="user-profile" class="flex items-center gap-2 ml-4 pl-4 border-l border-gray-600 hidden">
+                        <button id="customize-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
+                            <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                            Customize yourGPT
+                        </button>
                         <button id="profile-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
                             <div class="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1639,11 +2262,14 @@
                         </button>
                         <button id="sign-up-btn-md" class="bg-indigo-500 hover:bg-indigo-600 rounded-lg p-2 text-white transition-colors duration-200" title="Sign Up">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        </button>
+                    </button>
                     </div>
                     
                     <!-- User Profile for Medium Screens (hidden by default) -->
                     <div id="user-profile-md" class="flex items-center gap-1 ml-2 pl-2 border-l border-gray-600 hidden">
+                        <button id="customize-btn-md" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-white transition-colors duration-200" title="Customize yourGPT">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </button>
                         <button id="profile-btn-md" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-white transition-colors duration-200" title="Profile">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         </button>
@@ -1692,6 +2318,10 @@
                             
                             <!-- User Profile for Mobile (hidden by default) -->
                             <div id="user-profile-mobile" class="border-t border-gray-600 mt-2 pt-3 hidden">
+                                <button id="customize-btn-mobile" class="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    Customize yourGPT
+                                </button>
                                 <button id="profile-btn-mobile" class="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center gap-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                     Profile
@@ -1849,64 +2479,296 @@
     </div>
 
     <!-- Authentication Modals -->
-    <div id="sign-in-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl max-w-md w-full flex flex-col">
-            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                <h3 class="text-xl font-semibold text-white">Sign In</h3>
-                <button class="close-modal-btn text-gray-400 hover:text-white">&times;</button>
-            </div>
-            <div class="p-6">
-                <form id="sign-in-form">
-                    <div class="space-y-4">
-                        <div>
-                            <label for="sign-in-email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                            <input type="email" id="sign-in-email" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your email">
+    <div id="sign-in-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 transition-all duration-300">
+        <div class="modal-content bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl shadow-2xl max-w-md w-full flex flex-col border border-gray-700/50 transform scale-95 transition-all duration-300">
+            <!-- Premium Header with Gradient -->
+            <div class="relative p-6 border-b border-gray-700/50">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 rounded-t-3xl"></div>
+                <div class="relative flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                                <polyline points="10,17 15,12 10,7"/>
+                                <line x1="15" y1="12" x2="3" y2="12"/>
+                            </svg>
                         </div>
                         <div>
-                            <label for="sign-in-password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                            <input type="password" id="sign-in-password" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your password">
+                            <h3 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Welcome Back</h3>
+                            <p class="text-sm text-gray-400">Sign in to your account</p>
                         </div>
-                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 rounded-lg p-3 text-lg font-semibold transition-colors duration-200">Sign In</button>
                     </div>
+                    <button class="close-modal-btn w-8 h-8 bg-gray-700/50 hover:bg-gray-600/50 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200 hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Premium Form Content -->
+            <div class="p-6">
+                <form id="sign-in-form" class="space-y-6">
+                    <!-- Email Field with Floating Label -->
+                    <div class="relative group">
+                        <label for="sign-in-email" class="block text-sm font-medium text-gray-300 mb-2 transition-colors duration-200 group-focus-within:text-indigo-400">Email Address</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-focus-within:text-indigo-400 transition-colors duration-200">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                            </div>
+                            <input 
+                                type="email" 
+                                id="sign-in-email" 
+                                required 
+                                class="w-full bg-gray-800/50 border border-gray-600/50 rounded-xl pl-12 pr-4 py-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-200 backdrop-blur-sm hover:bg-gray-800/70" 
+                                placeholder="Enter your email address"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field with Floating Label -->
+                    <div class="relative group">
+                        <label for="sign-in-password" class="block text-sm font-medium text-gray-300 mb-2 transition-colors duration-200 group-focus-within:text-indigo-400">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-focus-within:text-indigo-400 transition-colors duration-200">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <circle cx="12" cy="16" r="1"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            </div>
+                            <input 
+                                type="password" 
+                                id="sign-in-password" 
+                                required 
+                                class="w-full bg-gray-800/50 border border-gray-600/50 rounded-xl pl-12 pr-12 py-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-200 backdrop-blur-sm hover:bg-gray-800/70" 
+                                placeholder="Enter your password"
+                            >
+                            <button 
+                                type="button" 
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                                onclick="togglePasswordVisibility('sign-in-password')"
+                            >
+                                <svg id="sign-in-password-eye" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Premium Sign In Button -->
+                    <button 
+                        type="submit" 
+                        class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 rounded-xl py-4 text-lg font-semibold text-white transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-indigo-500/25 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 focus:ring-offset-gray-800 relative overflow-hidden group"
+                    >
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                                <polyline points="10,17 15,12 10,7"/>
+                                <line x1="15" y1="12" x2="3" y2="12"/>
+                            </svg>
+                            Sign In
+                        </span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    </button>
                 </form>
-                <div class="mt-4 text-center space-y-2">
-                    <p class="text-gray-400 text-sm">Don't have an account? <button id="switch-to-signup" class="text-indigo-400 hover:text-indigo-300">Sign up</button></p>
-                    <p class="text-gray-400 text-sm"><button id="forgot-password-btn" class="text-indigo-400 hover:text-indigo-300">Forgot your password?</button></p>
+                
+                <!-- Premium Footer Links -->
+                <div class="mt-6 space-y-3">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-700/50"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-gray-800 text-gray-400">Quick Actions</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3">
+                        <p class="text-center text-gray-400 text-sm">
+                            Don't have an account? 
+                            <button id="switch-to-signup" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors duration-200 hover:underline">Create one now</button>
+                        </p>
+                        <button id="forgot-password-btn" class="text-center text-gray-400 hover:text-indigo-400 text-sm transition-colors duration-200 hover:underline">
+                            Forgot your password?
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="sign-up-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl max-w-md w-full flex flex-col">
-            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                <h3 class="text-xl font-semibold text-white">Sign Up</h3>
-                <button class="close-modal-btn text-gray-400 hover:text-white">&times;</button>
-            </div>
-            <div class="p-6">
-                <form id="sign-up-form">
-                    <div class="space-y-4">
-                        <div>
-                            <label for="sign-up-name" class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                            <input type="text" id="sign-up-name" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your full name">
+    <div id="sign-up-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 transition-all duration-300">
+        <div class="modal-content bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl shadow-2xl max-w-md w-full flex flex-col border border-gray-700/50 transform scale-95 transition-all duration-300">
+            <!-- Premium Header with Gradient -->
+            <div class="relative p-6 border-b border-gray-700/50">
+                <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-blue-500/10 to-purple-500/10 rounded-t-3xl"></div>
+                <div class="relative flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
                         </div>
                         <div>
-                            <label for="sign-up-email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                            <input type="email" id="sign-up-email" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your email">
+                            <h3 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Join YourGPT</h3>
+                            <p class="text-sm text-gray-400">Create your account today</p>
                         </div>
-                        <div>
-                            <label for="sign-up-password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                            <input type="password" id="sign-up-password" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Create a password">
-                        </div>
-                        <div>
-                            <label for="sign-up-confirm-password" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
-                            <input type="password" id="sign-up-confirm-password" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Confirm your password">
-                        </div>
-                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 rounded-lg p-3 text-lg font-semibold transition-colors duration-200">Sign Up</button>
                     </div>
+                    <button class="close-modal-btn w-8 h-8 bg-gray-700/50 hover:bg-gray-600/50 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200 hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Premium Form Content -->
+            <div class="p-6">
+                <form id="sign-up-form" class="space-y-5">
+                    <!-- Full Name Field -->
+                    <div class="relative group">
+                        <label for="sign-up-name" class="block text-sm font-medium text-gray-300 mb-2 transition-colors duration-200 group-focus-within:text-emerald-400">Full Name</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-focus-within:text-emerald-400 transition-colors duration-200">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="sign-up-name" 
+                                required 
+                                class="w-full bg-gray-800/50 border border-gray-600/50 rounded-xl pl-12 pr-4 py-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 backdrop-blur-sm hover:bg-gray-800/70" 
+                                placeholder="Enter your full name"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Email Field -->
+                    <div class="relative group">
+                        <label for="sign-up-email" class="block text-sm font-medium text-gray-300 mb-2 transition-colors duration-200 group-focus-within:text-emerald-400">Email Address</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-focus-within:text-emerald-400 transition-colors duration-200">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                            </div>
+                            <input 
+                                type="email" 
+                                id="sign-up-email" 
+                                required 
+                                class="w-full bg-gray-800/50 border border-gray-600/50 rounded-xl pl-12 pr-4 py-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 backdrop-blur-sm hover:bg-gray-800/70" 
+                                placeholder="Enter your email address"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="relative group">
+                        <label for="sign-up-password" class="block text-sm font-medium text-gray-300 mb-2 transition-colors duration-200 group-focus-within:text-emerald-400">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-focus-within:text-emerald-400 transition-colors duration-200">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <circle cx="12" cy="16" r="1"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            </div>
+                            <input 
+                                type="password" 
+                                id="sign-up-password" 
+                                required 
+                                class="w-full bg-gray-800/50 border border-gray-600/50 rounded-xl pl-12 pr-12 py-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 backdrop-blur-sm hover:bg-gray-800/70" 
+                                placeholder="Create a strong password"
+                            >
+                            <button 
+                                type="button" 
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                                onclick="togglePasswordVisibility('sign-up-password')"
+                            >
+                                <svg id="sign-up-password-eye" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirm Password Field -->
+                    <div class="relative group">
+                        <label for="sign-up-confirm-password" class="block text-sm font-medium text-gray-300 mb-2 transition-colors duration-200 group-focus-within:text-emerald-400">Confirm Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-focus-within:text-emerald-400 transition-colors duration-200">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <circle cx="12" cy="16" r="1"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            </div>
+                            <input 
+                                type="password" 
+                                id="sign-up-confirm-password" 
+                                required 
+                                class="w-full bg-gray-800/50 border border-gray-600/50 rounded-xl pl-12 pr-12 py-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 backdrop-blur-sm hover:bg-gray-800/70" 
+                                placeholder="Confirm your password"
+                            >
+                            <button 
+                                type="button" 
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                                onclick="togglePasswordVisibility('sign-up-confirm-password')"
+                            >
+                                <svg id="sign-up-confirm-password-eye" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Premium Sign Up Button -->
+                    <button 
+                        type="submit" 
+                        class="w-full bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 rounded-xl py-4 text-lg font-semibold text-white transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/25 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-gray-800 relative overflow-hidden group"
+                    >
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            Create Account
+                        </span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    </button>
                 </form>
-                <div class="mt-4 text-center">
-                    <p class="text-gray-400 text-sm">Already have an account? <button id="switch-to-signin" class="text-indigo-400 hover:text-indigo-300">Sign in</button></p>
+                
+                <!-- Premium Footer Links -->
+                <div class="mt-4">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-700/50"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-gray-800 text-gray-400">Already have an account?</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-center text-gray-400 text-sm mt-3">
+                        <button id="switch-to-signin" class="text-emerald-400 hover:text-emerald-300 font-medium transition-colors duration-200 hover:underline">Sign in instead</button>
+                    </p>
                 </div>
             </div>
         </div>
@@ -1980,6 +2842,194 @@
         </div>
     </div>
 
+    <!-- Customize yourGPT Modal -->
+    <div id="customize-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full flex flex-col">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-white flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    Customize yourGPT
+                </h3>
+                <button class="close-modal-btn text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-6">
+                    <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400 mt-0.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            <div>
+                                <h4 class="text-blue-400 font-medium mb-1">How it works</h4>
+                                <p class="text-gray-300 text-sm">Tell yourGPT about yourself, your preferences, work, hobbies, or any information you'd like it to remember. This will help yourGPT provide more personalized and relevant responses.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Your Custom Instructions</label>
+                        <textarea 
+                            id="custom-instructions-input" 
+                            class="w-full bg-gray-700 rounded-lg p-4 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none" 
+                            rows="8" 
+                            placeholder="Tell yourGPT about yourself...&#10;&#10;Examples:&#10;• I'm a software developer working with React and Node.js&#10;• I prefer concise, technical explanations&#10;• I'm learning Spanish and would like help with grammar&#10;• I have a dog named Max and love hiking&#10;• I work in marketing and need help with campaign ideas"
+                        ></textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-500">This information will be used to personalize your chat experience</span>
+                            <span id="char-count" class="text-xs text-gray-500">0/2000 characters</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button id="save-custom-instructions-btn" class="flex-1 bg-purple-500 hover:bg-purple-600 rounded-lg p-3 text-white font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                            Save Instructions
+                        </button>
+                        <button id="clear-custom-instructions-btn" class="bg-gray-600 hover:bg-gray-700 rounded-lg p-3 text-white font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/></svg>
+                            Clear
+                        </button>
+                    </div>
+                    
+                    <div id="custom-instructions-status" class="hidden">
+                        <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-400"><polyline points="20,6 9,17 4,12"/></svg>
+                                <span class="text-green-400 text-sm font-medium">Custom instructions saved successfully!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="change-password-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl max-w-md w-full flex flex-col">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-white flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><circle cx="12" cy="16" r="1"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Change Password
+                </h3>
+                <button class="close-modal-btn text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-6">
+                    <div class="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-400 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <div>
+                                <h4 class="text-yellow-400 font-medium mb-1">Security Notice</h4>
+                                <p class="text-gray-300 text-sm">Make sure to use a strong password with at least 8 characters, including uppercase, lowercase, numbers, and special characters.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form id="change-password-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Current Password</label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="current-password-input" 
+                                    class="w-full bg-gray-700 rounded-lg p-3 pr-10 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                                    placeholder="Enter your current password"
+                                    required
+                                >
+                                <button 
+                                    type="button" 
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                    onclick="togglePasswordVisibility('current-password-input')"
+                                >
+                                    <svg id="current-password-eye" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="new-password-input" 
+                                    class="w-full bg-gray-700 rounded-lg p-3 pr-10 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                                    placeholder="Enter your new password"
+                                    required
+                                    minlength="8"
+                                >
+                                <button 
+                                    type="button" 
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                    onclick="togglePasswordVisibility('new-password-input')"
+                                >
+                                    <svg id="new-password-eye" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
+                            <div id="password-strength" class="mt-2 hidden">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-xs text-gray-400">Password strength:</span>
+                                    <div class="flex-1 bg-gray-600 rounded-full h-2">
+                                        <div id="strength-bar" class="h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                    </div>
+                                    <span id="strength-text" class="text-xs font-medium">Weak</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Confirm New Password</label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="confirm-password-input" 
+                                    class="w-full bg-gray-700 rounded-lg p-3 pr-10 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                                    placeholder="Confirm your new password"
+                                    required
+                                >
+                                <button 
+                                    type="button" 
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                    onclick="togglePasswordVisibility('confirm-password-input')"
+                                >
+                                    <svg id="confirm-password-eye" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
+                            <div id="password-match" class="mt-1 hidden">
+                                <span id="match-text" class="text-xs"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-3 pt-2">
+                            <button 
+                                type="submit" 
+                                id="update-password-btn" 
+                                class="flex-1 bg-indigo-500 hover:bg-indigo-600 rounded-lg p-3 text-white font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                                Update Password
+                            </button>
+                            <button 
+                                type="button" 
+                                id="cancel-password-btn" 
+                                class="bg-gray-600 hover:bg-gray-700 rounded-lg p-3 text-white font-medium transition-colors duration-200"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div id="password-change-status" class="hidden">
+                        <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-400"><polyline points="20,6 9,17 4,12"/></svg>
+                                <span class="text-green-400 text-sm font-medium">Password updated successfully!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
     // Supabase Configuration
     const SUPABASE_URL = 'https://wapjatvksqdukowojkpv.supabase.co';
@@ -1987,6 +3037,170 @@
     
     // Initialize Supabase client
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Enhanced password visibility toggle with animation
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const eyeIcon = document.getElementById(inputId + '-eye');
+        
+        if (!input || !eyeIcon) return;
+        
+        // Add transition effect
+        eyeIcon.style.transition = 'transform 0.2s ease';
+        eyeIcon.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                input.type = 'password';
+                eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+            
+            eyeIcon.style.transform = 'scale(1)';
+        }, 100);
+    }
+
+    // Enhanced form validation with visual feedback
+    function validateField(input, validationFn, errorMessage) {
+        const isValid = validationFn(input.value);
+        
+        // Remove existing classes
+        input.classList.remove('error', 'success');
+        
+        if (input.value.length > 0) {
+            if (isValid) {
+                input.classList.add('success');
+                removeFieldError(input);
+            } else {
+                input.classList.add('error');
+                showFieldError(input, errorMessage);
+            }
+        }
+        
+        return isValid;
+    }
+
+    // Show field error with animation
+    function showFieldError(input, message) {
+        removeFieldError(input);
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'field-error text-red-400 text-xs mt-1 animate-fadeIn';
+        errorDiv.textContent = message;
+        
+        input.parentNode.appendChild(errorDiv);
+    }
+
+    // Remove field error
+    function removeFieldError(input) {
+        const existingError = input.parentNode.querySelector('.field-error');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+
+    // Validation functions
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function validatePassword(password) {
+        return password.length >= 6;
+    }
+
+    function validateName(name) {
+        return name.trim().length >= 2;
+    }
+
+    function validatePasswordMatch(password, confirmPassword) {
+        return password === confirmPassword;
+    }
+
+    // Enhanced loading state for buttons
+    function setButtonLoading(button, isLoading) {
+        if (isLoading) {
+            button.classList.add('loading');
+            button.disabled = true;
+        } else {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
+    }
+    
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        let score = 0;
+        let feedback = [];
+        
+        // Length check
+        if (password.length >= 8) score += 1;
+        else feedback.push('At least 8 characters');
+        
+        // Uppercase check
+        if (/[A-Z]/.test(password)) score += 1;
+        else feedback.push('Uppercase letter');
+        
+        // Lowercase check
+        if (/[a-z]/.test(password)) score += 1;
+        else feedback.push('Lowercase letter');
+        
+        // Number check
+        if (/\d/.test(password)) score += 1;
+        else feedback.push('Number');
+        
+        // Special character check
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score += 1;
+        else feedback.push('Special character');
+        
+        // Length bonus
+        if (password.length >= 12) score += 1;
+        
+        return { score, feedback };
+    }
+    
+    // Update password strength indicator
+    function updatePasswordStrength(password) {
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthText = document.getElementById('strength-text');
+        const passwordStrength = document.getElementById('password-strength');
+        
+        if (!password) {
+            passwordStrength.classList.add('hidden');
+            return;
+        }
+        
+        passwordStrength.classList.remove('hidden');
+        const { score, feedback } = checkPasswordStrength(password);
+        
+        let percentage = (score / 6) * 100;
+        let color = 'bg-red-500';
+        let text = 'Very Weak';
+        
+        if (score >= 2) {
+            color = 'bg-orange-500';
+            text = 'Weak';
+        }
+        if (score >= 3) {
+            color = 'bg-yellow-500';
+            text = 'Fair';
+        }
+        if (score >= 4) {
+            color = 'bg-blue-500';
+            text = 'Good';
+        }
+        if (score >= 5) {
+            color = 'bg-green-500';
+            text = 'Strong';
+        }
+        
+        strengthBar.style.width = percentage + '%';
+        strengthBar.className = `h-2 rounded-full transition-all duration-300 ${color}`;
+        strengthText.textContent = text;
+        strengthText.className = `text-xs font-medium ${color.replace('bg-', 'text-')}`;
+    }
     
     // Authentication state
     let currentUser = null;
@@ -2095,7 +3309,7 @@
         }
         
         try {
-            populatePersonas();
+        populatePersonas();
             console.log('populatePersonas completed');
         } catch (error) {
             console.error('populatePersonas failed:', error);
@@ -2279,16 +3493,21 @@
     const profileBtn = document.getElementById('profile-btn');
     const profileBtnMd = document.getElementById('profile-btn-md');
     const profileBtnMobile = document.getElementById('profile-btn-mobile');
+    const customizeBtn = document.getElementById('customize-btn');
+    const customizeBtnMd = document.getElementById('customize-btn-md');
+    const customizeBtnMobile = document.getElementById('customize-btn-mobile');
     
     // Desktop auth buttons
     if (signInBtn) signInBtn.addEventListener('click', () => document.getElementById('sign-in-modal').classList.add('active'));
     if (signUpBtn) signUpBtn.addEventListener('click', () => document.getElementById('sign-up-modal').classList.add('active'));
     if (profileBtn) profileBtn.addEventListener('click', () => document.getElementById('profile-modal').classList.add('active'));
+    if (customizeBtn) customizeBtn.addEventListener('click', () => document.getElementById('customize-modal').classList.add('active'));
     
     // Medium screen auth buttons
     if (signInBtnMd) signInBtnMd.addEventListener('click', () => document.getElementById('sign-in-modal').classList.add('active'));
     if (signUpBtnMd) signUpBtnMd.addEventListener('click', () => document.getElementById('sign-up-modal').classList.add('active'));
     if (profileBtnMd) profileBtnMd.addEventListener('click', () => document.getElementById('profile-modal').classList.add('active'));
+    if (customizeBtnMd) customizeBtnMd.addEventListener('click', () => document.getElementById('customize-modal').classList.add('active'));
     
     // Mobile auth buttons
     if (signInBtnMobile) signInBtnMobile.addEventListener('click', () => {
@@ -2301,6 +3520,10 @@
     });
     if (profileBtnMobile) profileBtnMobile.addEventListener('click', () => {
         document.getElementById('profile-modal').classList.add('active');
+        mobileMenu.classList.add('hidden');
+    });
+    if (customizeBtnMobile) customizeBtnMobile.addEventListener('click', () => {
+        document.getElementById('customize-modal').classList.add('active');
         mobileMenu.classList.add('hidden');
     });
     
@@ -2322,7 +3545,6 @@
     const mobileSidebarBtn = document.getElementById('mobile-sidebar-btn');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
     
     // Touch gesture variables
     let touchStartX = 0;
@@ -2364,23 +3586,6 @@
         sidebar.style.opacity = '';
     }
     
-    // Close sidebar button
-    if (closeSidebarBtn) {
-        closeSidebarBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Close sidebar button clicked'); // Debug log
-            closeSidebar();
-        });
-        
-        // Add touch event for better mobile support
-        closeSidebarBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Close sidebar button touched'); // Debug log
-            closeSidebar();
-        });
-    }
     
     // Close sidebar when clicking overlay
     if (sidebarOverlay) {
@@ -2513,7 +3718,6 @@
         console.log('Mobile sidebar button:', mobileSidebarBtn);
         console.log('Sidebar:', sidebar);
         console.log('Sidebar overlay:', sidebarOverlay);
-        console.log('Close sidebar button:', closeSidebarBtn);
     });
     
     // Mobile button event listeners
@@ -2648,50 +3852,221 @@
     const switchToSigninBtn = document.getElementById('switch-to-signin');
     
     if (signInForm) {
+        // Add real-time validation
+        const emailInput = document.getElementById('sign-in-email');
+        const passwordInput = document.getElementById('sign-in-password');
+        const submitBtn = signInForm.querySelector('button[type="submit"]');
+        
+        if (emailInput) {
+            emailInput.addEventListener('blur', () => {
+                validateField(emailInput, validateEmail, 'Please enter a valid email address');
+            });
+            
+            emailInput.addEventListener('input', () => {
+                if (emailInput.classList.contains('error')) {
+                    validateField(emailInput, validateEmail, 'Please enter a valid email address');
+                }
+            });
+        }
+        
+        if (passwordInput) {
+            passwordInput.addEventListener('blur', () => {
+                validateField(passwordInput, validatePassword, 'Password must be at least 6 characters');
+            });
+            
+            passwordInput.addEventListener('input', () => {
+                if (passwordInput.classList.contains('error')) {
+                    validateField(passwordInput, validatePassword, 'Password must be at least 6 characters');
+                }
+            });
+        }
+        
         signInForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('sign-in-email').value;
-            const password = document.getElementById('sign-in-password').value;
             
-            const result = await signIn(email, password);
-            if (result.success) {
-                document.getElementById('sign-in-modal').classList.remove('active');
-                signInForm.reset();
-            } else {
-                alert('Sign in failed: ' + result.error);
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            
+            // Validate all fields
+            const isEmailValid = validateField(emailInput, validateEmail, 'Please enter a valid email address');
+            const isPasswordValid = validateField(passwordInput, validatePassword, 'Password must be at least 6 characters');
+            
+            if (!isEmailValid || !isPasswordValid) {
+                return;
+            }
+            
+            // Set loading state
+            setButtonLoading(submitBtn, true);
+            
+            try {
+                const result = await signIn(email, password);
+                if (result.success) {
+                    // Success animation
+                    submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    setTimeout(() => {
+                        document.getElementById('sign-in-modal').classList.remove('active');
+                        signInForm.reset();
+                        // Reset button style
+                        submitBtn.style.background = '';
+                    }, 1000);
+                } else {
+                    // Error feedback
+                    showFieldError(emailInput, result.error);
+                    setButtonLoading(submitBtn, false);
+                }
+            } catch (error) {
+                showFieldError(emailInput, 'An unexpected error occurred');
+                setButtonLoading(submitBtn, false);
             }
         });
     }
     
     if (signUpForm) {
+        // Add real-time validation
+        const nameInput = document.getElementById('sign-up-name');
+        const emailInput = document.getElementById('sign-up-email');
+        const passwordInput = document.getElementById('sign-up-password');
+        const confirmPasswordInput = document.getElementById('sign-up-confirm-password');
+        const submitBtn = signUpForm.querySelector('button[type="submit"]');
+        
+        // Name validation
+        if (nameInput) {
+            nameInput.addEventListener('blur', () => {
+                validateField(nameInput, validateName, 'Name must be at least 2 characters');
+            });
+            
+            nameInput.addEventListener('input', () => {
+                if (nameInput.classList.contains('error')) {
+                    validateField(nameInput, validateName, 'Name must be at least 2 characters');
+                }
+            });
+        }
+        
+        // Email validation
+        if (emailInput) {
+            emailInput.addEventListener('blur', () => {
+                validateField(emailInput, validateEmail, 'Please enter a valid email address');
+            });
+            
+            emailInput.addEventListener('input', () => {
+                if (emailInput.classList.contains('error')) {
+                    validateField(emailInput, validateEmail, 'Please enter a valid email address');
+                }
+            });
+        }
+        
+        // Password validation
+        if (passwordInput) {
+            passwordInput.addEventListener('blur', () => {
+                validateField(passwordInput, validatePassword, 'Password must be at least 6 characters');
+            });
+            
+            passwordInput.addEventListener('input', () => {
+                if (passwordInput.classList.contains('error')) {
+                    validateField(passwordInput, validatePassword, 'Password must be at least 6 characters');
+                }
+                
+                // Check password match if confirm password has value
+                if (confirmPasswordInput.value) {
+                    const isMatch = validatePasswordMatch(passwordInput.value, confirmPasswordInput.value);
+                    if (isMatch) {
+                        confirmPasswordInput.classList.remove('error');
+                        confirmPasswordInput.classList.add('success');
+                        removeFieldError(confirmPasswordInput);
+                    } else {
+                        confirmPasswordInput.classList.remove('success');
+                        confirmPasswordInput.classList.add('error');
+                        showFieldError(confirmPasswordInput, 'Passwords do not match');
+                    }
+                }
+            });
+        }
+        
+        // Confirm password validation
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener('blur', () => {
+                const isMatch = validatePasswordMatch(passwordInput.value, confirmPasswordInput.value);
+                if (confirmPasswordInput.value) {
+                    if (isMatch) {
+                        confirmPasswordInput.classList.remove('error');
+                        confirmPasswordInput.classList.add('success');
+                        removeFieldError(confirmPasswordInput);
+                    } else {
+                        confirmPasswordInput.classList.remove('success');
+                        confirmPasswordInput.classList.add('error');
+                        showFieldError(confirmPasswordInput, 'Passwords do not match');
+                    }
+                }
+            });
+            
+            confirmPasswordInput.addEventListener('input', () => {
+                if (confirmPasswordInput.classList.contains('error')) {
+                    const isMatch = validatePasswordMatch(passwordInput.value, confirmPasswordInput.value);
+                    if (isMatch) {
+                        confirmPasswordInput.classList.remove('error');
+                        confirmPasswordInput.classList.add('success');
+                        removeFieldError(confirmPasswordInput);
+                    } else {
+                        confirmPasswordInput.classList.remove('success');
+                        confirmPasswordInput.classList.add('error');
+                        showFieldError(confirmPasswordInput, 'Passwords do not match');
+                    }
+                }
+            });
+        }
+        
         signUpForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const fullName = document.getElementById('sign-up-name').value;
-            const email = document.getElementById('sign-up-email').value;
-            const password = document.getElementById('sign-up-password').value;
-            const confirmPassword = document.getElementById('sign-up-confirm-password').value;
             
-            if (!fullName.trim()) {
-                alert('Please enter your full name');
+            const fullName = nameInput.value;
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            // Validate all fields
+            const isNameValid = validateField(nameInput, validateName, 'Name must be at least 2 characters');
+            const isEmailValid = validateField(emailInput, validateEmail, 'Please enter a valid email address');
+            const isPasswordValid = validateField(passwordInput, validatePassword, 'Password must be at least 6 characters');
+            const isPasswordMatch = validatePasswordMatch(password, confirmPassword);
+            
+            if (confirmPassword) {
+                if (isPasswordMatch) {
+                    confirmPasswordInput.classList.remove('error');
+                    confirmPasswordInput.classList.add('success');
+                    removeFieldError(confirmPasswordInput);
+                } else {
+                    confirmPasswordInput.classList.remove('success');
+                    confirmPasswordInput.classList.add('error');
+                    showFieldError(confirmPasswordInput, 'Passwords do not match');
+                }
+            }
+            
+            if (!isNameValid || !isEmailValid || !isPasswordValid || !isPasswordMatch) {
                 return;
             }
             
-            if (password !== confirmPassword) {
-                alert('Passwords do not match');
-                return;
-            }
+            // Set loading state
+            setButtonLoading(submitBtn, true);
             
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters long');
-                return;
-            }
-            
-            const result = await signUp(email, password, fullName);
-            if (result.success) {
-                document.getElementById('sign-up-modal').classList.remove('active');
-                signUpForm.reset();
-            } else {
-                alert('Sign up failed: ' + result.error);
+            try {
+                const result = await signUp(email, password, fullName);
+                if (result.success) {
+                    // Success animation
+                    submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    setTimeout(() => {
+                        document.getElementById('sign-up-modal').classList.remove('active');
+                        signUpForm.reset();
+                        // Reset button style
+                        submitBtn.style.background = '';
+                    }, 1000);
+                } else {
+                    // Error feedback
+                    showFieldError(emailInput, result.error);
+                    setButtonLoading(submitBtn, false);
+                }
+            } catch (error) {
+                showFieldError(emailInput, 'An unexpected error occurred');
+                setButtonLoading(submitBtn, false);
             }
         });
     }
@@ -2779,7 +4154,7 @@
     
     if (changePasswordBtn) {
         changePasswordBtn.addEventListener('click', () => {
-            alert('Password change functionality will be implemented in a future update.');
+            document.getElementById('change-password-modal').classList.add('active');
         });
     }
     
@@ -2805,6 +4180,277 @@
             }
         }
     });
+    
+    // Customize functionality
+    const saveCustomInstructionsBtn = document.getElementById('save-custom-instructions-btn');
+    const clearCustomInstructionsBtn = document.getElementById('clear-custom-instructions-btn');
+    const customInstructionsInput = document.getElementById('custom-instructions-input');
+    const charCount = document.getElementById('char-count');
+    const customInstructionsStatus = document.getElementById('custom-instructions-status');
+    
+    // Character count for custom instructions
+    if (customInstructionsInput && charCount) {
+        customInstructionsInput.addEventListener('input', () => {
+            const count = customInstructionsInput.value.length;
+            charCount.textContent = `${count}/2000 characters`;
+            
+            if (count > 2000) {
+                charCount.classList.add('text-red-500');
+                charCount.classList.remove('text-gray-500');
+            } else {
+                charCount.classList.remove('text-red-500');
+                charCount.classList.add('text-gray-500');
+            }
+        });
+    }
+    
+    // Save custom instructions
+    if (saveCustomInstructionsBtn) {
+        saveCustomInstructionsBtn.addEventListener('click', async () => {
+            const instructions = customInstructionsInput.value.trim();
+            
+            if (instructions.length > 2000) {
+                alert('Custom instructions cannot exceed 2000 characters.');
+                return;
+            }
+            
+            if (!currentUser) {
+                alert('Please sign in to save custom instructions.');
+                return;
+            }
+            
+            try {
+                saveCustomInstructionsBtn.disabled = true;
+                saveCustomInstructionsBtn.innerHTML = `
+                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                `;
+                
+                // Save to Supabase user metadata
+                const { error } = await supabase.auth.updateUser({
+                    data: { custom_instructions: instructions }
+                });
+                
+                if (error) throw error;
+                
+                // Show success message
+                customInstructionsStatus.classList.remove('hidden');
+                setTimeout(() => {
+                    customInstructionsStatus.classList.add('hidden');
+                }, 3000);
+                
+                // Update current user data
+                currentUser.user_metadata = currentUser.user_metadata || {};
+                currentUser.user_metadata.custom_instructions = instructions;
+                
+            } catch (error) {
+                alert('Failed to save custom instructions: ' + error.message);
+            } finally {
+                saveCustomInstructionsBtn.disabled = false;
+                saveCustomInstructionsBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                    Save Instructions
+                `;
+            }
+        });
+    }
+    
+    // Clear custom instructions
+    if (clearCustomInstructionsBtn) {
+        clearCustomInstructionsBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear your custom instructions?')) {
+                customInstructionsInput.value = '';
+                charCount.textContent = '0/2000 characters';
+                charCount.classList.remove('text-red-500');
+                charCount.classList.add('text-gray-500');
+            }
+        });
+    }
+    
+    // Load custom instructions when modal opens
+    document.getElementById('customize-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'customize-modal' || e.target.classList.contains('close-modal-btn')) {
+            if (currentUser && customInstructionsInput) {
+                const instructions = currentUser.user_metadata?.custom_instructions || '';
+                customInstructionsInput.value = instructions;
+                const count = instructions.length;
+                charCount.textContent = `${count}/2000 characters`;
+                if (count > 2000) {
+                    charCount.classList.add('text-red-500');
+                    charCount.classList.remove('text-gray-500');
+                } else {
+                    charCount.classList.remove('text-red-500');
+                    charCount.classList.add('text-gray-500');
+                }
+            }
+        }
+    });
+    
+    // Change Password functionality
+    const changePasswordForm = document.getElementById('change-password-form');
+    const updatePasswordBtn = document.getElementById('update-password-btn');
+    const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+    const newPasswordInput = document.getElementById('new-password-input');
+    const confirmPasswordInput = document.getElementById('confirm-password-input');
+    const passwordChangeStatus = document.getElementById('password-change-status');
+    const passwordMatch = document.getElementById('password-match');
+    const matchText = document.getElementById('match-text');
+    
+    // Password strength checker for new password
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', (e) => {
+            updatePasswordStrength(e.target.value);
+        });
+    }
+    
+    // Password match checker
+    if (confirmPasswordInput && newPasswordInput) {
+        confirmPasswordInput.addEventListener('input', (e) => {
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = e.target.value;
+            
+            if (confirmPassword) {
+                passwordMatch.classList.remove('hidden');
+                if (newPassword === confirmPassword) {
+                    matchText.textContent = 'Passwords match ✓';
+                    matchText.className = 'text-xs text-green-400';
+                } else {
+                    matchText.textContent = 'Passwords do not match ✗';
+                    matchText.className = 'text-xs text-red-400';
+                }
+            } else {
+                passwordMatch.classList.add('hidden');
+            }
+        });
+    }
+    
+    // Cancel password change
+    if (cancelPasswordBtn) {
+        cancelPasswordBtn.addEventListener('click', () => {
+            document.getElementById('change-password-modal').classList.remove('active');
+            changePasswordForm.reset();
+            passwordChangeStatus.classList.add('hidden');
+            passwordMatch.classList.add('hidden');
+            document.getElementById('password-strength').classList.add('hidden');
+        });
+    }
+    
+    // Change password form submission
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('current-password-input').value;
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            // Validation
+            if (!currentPassword) {
+                alert('Please enter your current password.');
+                return;
+            }
+            
+            if (!newPassword) {
+                alert('Please enter a new password.');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                alert('New password must be at least 8 characters long.');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match.');
+                return;
+            }
+            
+            if (currentPassword === newPassword) {
+                alert('New password must be different from current password.');
+                return;
+            }
+            
+            // Check password strength
+            const { score } = checkPasswordStrength(newPassword);
+            if (score < 3) {
+                if (!confirm('Your password is weak. Are you sure you want to continue?')) {
+                    return;
+                }
+            }
+            
+            if (!currentUser) {
+                alert('Please sign in to change your password.');
+                return;
+            }
+            
+            try {
+                updatePasswordBtn.disabled = true;
+                updatePasswordBtn.innerHTML = `
+                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Updating...
+                `;
+                
+                // Update password using Supabase
+                const { error } = await supabase.auth.updateUser({
+                    password: newPassword
+                });
+                
+                if (error) throw error;
+                
+                // Show success message
+                passwordChangeStatus.classList.remove('hidden');
+                changePasswordForm.reset();
+                passwordMatch.classList.add('hidden');
+                document.getElementById('password-strength').classList.add('hidden');
+                
+                // Auto-close modal after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('change-password-modal').classList.remove('active');
+                    passwordChangeStatus.classList.add('hidden');
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Password update error:', error);
+                
+                // Handle specific error messages
+                let errorMessage = 'Failed to update password. ';
+                if (error.message.includes('Password should be at least')) {
+                    errorMessage += 'Password must be at least 6 characters long.';
+                } else if (error.message.includes('Invalid login credentials')) {
+                    errorMessage += 'Current password is incorrect.';
+                } else if (error.message.includes('same as the old password')) {
+                    errorMessage += 'New password must be different from current password.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                alert(errorMessage);
+            } finally {
+                updatePasswordBtn.disabled = false;
+                updatePasswordBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                    Update Password
+                `;
+            }
+        });
+    }
+    
+    // Reset change password modal when opened
+    document.getElementById('change-password-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'change-password-modal' || e.target.classList.contains('close-modal-btn')) {
+            changePasswordForm.reset();
+            passwordChangeStatus.classList.add('hidden');
+            passwordMatch.classList.add('hidden');
+            document.getElementById('password-strength').classList.add('hidden');
+        }
+    });
+    
     attachImageBtn.addEventListener('click', () => imageUploadInput.click());
     imageUploadInput.addEventListener('change', handleImageFileSelect);
     removeImageBtn.addEventListener('click', clearImageAttachment);
@@ -3033,8 +4679,18 @@
 - Always separate different topics with line breaks
 - Use formatting like **Bold**, *Italic*, and \`Code\` appropriately`;
         
-        // Combine config instruction with active persona instruction if any
+        // Combine config instruction with active persona instruction and user custom instructions
         let systemInstructionText = configInstruction;
+        
+        // Add user's custom instructions if they exist
+        if (currentUser && currentUser.user_metadata?.custom_instructions) {
+            systemInstructionText += "\n\n--- USER CUSTOM INSTRUCTIONS ---\n";
+            systemInstructionText += "The following information is about the user and should be used to provide personalized responses:\n\n";
+            systemInstructionText += currentUser.user_metadata.custom_instructions;
+            systemInstructionText += "\n\n--- END USER CUSTOM INSTRUCTIONS ---";
+        }
+        
+        // Add active persona instruction if any
         if (activeSystemInstruction) {
             systemInstructionText += "\n\n" + activeSystemInstruction;
         }
@@ -3154,29 +4810,29 @@
         }
 
         async saveCurrentChat() {
-            if (chatHistory.length === 0) return;
+        if (chatHistory.length === 0) return;
 
             console.log('ChatHistoryManager: Saving current chat...');
 
             if (currentUser) {
                 // Save to Supabase for authenticated users
-                if (activeChatId) {
+        if (activeChatId) {
                     // Update existing chat
-                    const chat = savedChats.find(c => c.id === activeChatId);
-                    if (chat) {
-                        chat.history = chatHistory;
-                        chat.systemInstruction = activeSystemInstruction;
+            const chat = savedChats.find(c => c.id === activeChatId);
+            if (chat) {
+                 chat.history = chatHistory;
+                 chat.systemInstruction = activeSystemInstruction;
                         await updateChatInSupabase(activeChatId, chat);
-                    }
-                } else {
+            }
+        } else {
                     // Create new chat
                     const firstUserMessagePart = chatHistory.find(m => m.role === 'user')?.parts?.find(p => p.text);
                     const title = firstUserMessagePart ? firstUserMessagePart.text : "New Chat";
-                    const newChat = {
-                        title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
-                        history: chatHistory,
-                        systemInstruction: activeSystemInstruction
-                    };
+            const newChat = {
+                title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
+                history: chatHistory,
+                systemInstruction: activeSystemInstruction
+            };
                     
                     const savedChat = await saveChatToSupabase(newChat);
                     if (savedChat) {
@@ -3210,9 +4866,9 @@
                         systemInstruction: activeSystemInstruction,
                         timestamp: Date.now()
                     };
-                    savedChats.unshift(newChat);
-                    activeChatId = newChat.id;
-                }
+            savedChats.unshift(newChat);
+            activeChatId = newChat.id;
+        }
                 
                 // Always save to localStorage for non-authenticated users
                 this.saveToLocalStorage();
@@ -3232,7 +4888,7 @@
 
         render() {
             console.log('ChatHistoryManager: Rendering chat history...');
-            renderChatHistory();
+        renderChatHistory();
         }
 
         async deleteChat(chatId) {
@@ -3276,12 +4932,12 @@
         console.log('loadChatsFromLocalStorage called, currentUser:', currentUser);
         // Only load from localStorage if user is not authenticated
         if (!currentUser) {
-            const chats = localStorage.getItem('yourGptChats');
+        const chats = localStorage.getItem('yourGptChats');
             console.log('localStorage chats:', chats);
-            if (chats) {
-                savedChats = JSON.parse(chats);
+        if (chats) {
+            savedChats = JSON.parse(chats);
                 console.log('Parsed savedChats:', savedChats);
-                renderChatHistory();
+            renderChatHistory();
             } else {
                 console.log('No chats in localStorage');
             }
@@ -3293,33 +4949,493 @@
     }
 
     function showWelcomeScreen() {
-        console.log('showWelcomeScreen called - new simple version');
+        console.log('showWelcomeScreen called - premium animated version');
         
         // Clear chat container
         chatContainer.innerHTML = '';
         
-        // Create new welcome screen content
+        // Create premium welcome screen content with advanced animations
         const welcomeHTML = `
-            <div id="welcome-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 2rem;">
-                <div style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2)); border: 2px solid #00ffff; border-radius: 50%; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 10px #00ffff);">
-                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-                        <path d="M5 3v4"/>
-                        <path d="M19 17v4"/>
-                        <path d="M3 5h4"/>
-                        <path d="M17 19h4"/>
-                    </svg>
+            <div id="welcome-screen" class="premium-welcome-container">
+                <!-- Animated Background Particles -->
+                <div class="welcome-particles">
+                    <div class="particle particle-1"></div>
+                    <div class="particle particle-2"></div>
+                    <div class="particle particle-3"></div>
+                    <div class="particle particle-4"></div>
+                    <div class="particle particle-5"></div>
+                    <div class="particle particle-6"></div>
                 </div>
-                <h1 style="color: #00ffff; font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">Hello, I'm YourGPT</h1>
-                <p style="color: #b0b0b0; font-size: 1.2rem; max-width: 500px; margin: 0 auto; line-height: 1.6;">I'm your personal AI assistant. How can I help you today?</p>
+                
+                <!-- Main Content Container -->
+                <div class="welcome-content">
+                    <!-- Premium Icon with Multiple Animation Layers -->
+                    <div class="icon-container">
+                        <div class="icon-glow-ring"></div>
+                        <div class="icon-pulse-ring"></div>
+                        <div class="icon-main">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg">
+                                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                                <path d="M5 3v4"/>
+                                <path d="M19 17v4"/>
+                                <path d="M3 5h4"/>
+                                <path d="M17 19h4"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Premium Typography with Advanced Effects -->
+                    <div class="text-container">
+                        <h1 class="welcome-title">
+                            <span class="title-line title-line-1">Hello, I'm</span>
+                            <span class="title-line title-line-2">YourGPT</span>
+                        </h1>
+                        
+                        <div class="subtitle-container">
+                            <p class="welcome-subtitle">
+                                <span class="subtitle-word">I'm</span>
+                                <span class="subtitle-word">your</span>
+                                <span class="subtitle-word">personal</span>
+                                <span class="subtitle-word">AI</span>
+                                <span class="subtitle-word">assistant.</span>
+                                <span class="subtitle-word">How</span>
+                                <span class="subtitle-word">can</span>
+                                <span class="subtitle-word">I</span>
+                                <span class="subtitle-word">help</span>
+                                <span class="subtitle-word">you</span>
+                                <span class="subtitle-word">today?</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Animated Cursor -->
+                        <div class="typing-cursor"></div>
+                    </div>
+                    
+                    <!-- Floating Elements -->
+                    <div class="floating-elements">
+                        <div class="floating-dot dot-1"></div>
+                        <div class="floating-dot dot-2"></div>
+                        <div class="floating-dot dot-3"></div>
+                    </div>
+                </div>
             </div>
         `;
         
         // Insert the welcome screen
         chatContainer.innerHTML = welcomeHTML;
         
-        console.log('Welcome screen created and inserted');
+        // Add premium CSS styles
+        addPremiumWelcomeStyles();
+        
+        // Start animations after a short delay
+        setTimeout(() => {
+            startWelcomeAnimations();
+        }, 100);
+        
+        console.log('Premium welcome screen created and inserted');
         console.log('Chat container children:', chatContainer.children.length);
+    }
+
+    // Add premium CSS styles for welcome screen
+    function addPremiumWelcomeStyles() {
+        // Check if styles are already added
+        if (document.getElementById('premium-welcome-styles')) {
+            return;
+        }
+
+        const style = document.createElement('style');
+        style.id = 'premium-welcome-styles';
+        style.textContent = `
+            /* Premium Welcome Screen Styles */
+            .premium-welcome-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                height: 100%;
+                text-align: center;
+                padding: 2rem;
+                padding-top: 8rem;
+                position: relative;
+                overflow: hidden;
+                background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.05) 0%, transparent 70%);
+            }
+
+            /* Animated Background Particles */
+            .welcome-particles {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .particle {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: linear-gradient(45deg, #00ffff, #ff00ff);
+                border-radius: 50%;
+                opacity: 0.6;
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .particle-1 { top: 20%; left: 10%; animation-delay: 0s; }
+            .particle-2 { top: 60%; left: 80%; animation-delay: 1s; }
+            .particle-3 { top: 30%; left: 70%; animation-delay: 2s; }
+            .particle-4 { top: 80%; left: 20%; animation-delay: 3s; }
+            .particle-5 { top: 10%; left: 50%; animation-delay: 4s; }
+            .particle-6 { top: 70%; left: 40%; animation-delay: 5s; }
+
+            /* Main Content */
+            .welcome-content {
+                position: relative;
+                z-index: 2;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            /* Premium Icon Container */
+            .icon-container {
+                position: relative;
+                margin-bottom: 3rem;
+                display: inline-block;
+            }
+
+            .icon-glow-ring {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 120px;
+                height: 120px;
+                border: 2px solid rgba(0, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: rotate 20s linear infinite;
+            }
+
+            .icon-pulse-ring {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 100px;
+                height: 100px;
+                border: 1px solid rgba(255, 0, 255, 0.4);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            .icon-main {
+                position: relative;
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+                border: 2px solid #00ffff;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                box-shadow: 
+                    0 0 30px rgba(0, 255, 255, 0.4),
+                    inset 0 0 20px rgba(255, 0, 255, 0.1);
+                animation: iconFloat 4s ease-in-out infinite;
+            }
+
+            .icon-svg {
+                color: #00ffff;
+                filter: drop-shadow(0 0 10px #00ffff);
+                animation: iconGlow 2s ease-in-out infinite alternate;
+            }
+
+            /* Premium Typography */
+            .text-container {
+                position: relative;
+                margin-bottom: 2rem;
+            }
+
+            .welcome-title {
+                font-family: 'Orbitron', monospace;
+                font-size: 3.5rem;
+                font-weight: 900;
+                margin: 0 0 1.5rem 0;
+                line-height: 1.1;
+                position: relative;
+            }
+
+            .title-line {
+                display: block;
+                background: linear-gradient(135deg, #00ffff, #ff00ff, #00ffff);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+                animation: gradientShift 3s ease infinite;
+            }
+
+            .title-line-1 {
+                animation-delay: 0s;
+                animation: slideInFromLeft 1s ease-out;
+            }
+
+            .title-line-2 {
+                animation-delay: 0.5s;
+                animation: slideInFromRight 1s ease-out 0.5s both;
+                font-size: 1.2em;
+                background: linear-gradient(135deg, #ff00ff, #00ffff, #ff00ff);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .subtitle-container {
+                position: relative;
+                margin-top: 2rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 1.4rem;
+                color: #b0b0b0;
+                line-height: 1.8;
+                max-width: 600px;
+                margin: 0 auto;
+                font-weight: 300;
+                letter-spacing: 0.5px;
+            }
+
+            .subtitle-word {
+                display: inline-block;
+                opacity: 0;
+                transform: translateY(20px);
+                animation: wordFadeIn 0.6s ease-out forwards;
+                margin-right: 0.3em;
+            }
+
+            .subtitle-word:nth-child(1) { animation-delay: 1.5s; }
+            .subtitle-word:nth-child(2) { animation-delay: 1.7s; }
+            .subtitle-word:nth-child(3) { animation-delay: 1.9s; }
+            .subtitle-word:nth-child(4) { animation-delay: 2.1s; }
+            .subtitle-word:nth-child(5) { animation-delay: 2.3s; }
+            .subtitle-word:nth-child(6) { animation-delay: 2.5s; }
+            .subtitle-word:nth-child(7) { animation-delay: 2.7s; }
+            .subtitle-word:nth-child(8) { animation-delay: 2.9s; }
+            .subtitle-word:nth-child(9) { animation-delay: 3.1s; }
+            .subtitle-word:nth-child(10) { animation-delay: 3.3s; }
+            .subtitle-word:nth-child(11) { animation-delay: 3.5s; }
+
+            /* Typing Cursor */
+            .typing-cursor {
+                display: inline-block;
+                width: 3px;
+                height: 1.4rem;
+                background: #00ffff;
+                margin-left: 2px;
+                animation: blink 1s infinite;
+                box-shadow: 0 0 10px #00ffff;
+            }
+
+            /* Floating Elements */
+            .floating-elements {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .floating-dot {
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                background: radial-gradient(circle, #00ffff, transparent);
+                border-radius: 50%;
+                opacity: 0.7;
+            }
+
+            .dot-1 {
+                top: 20%;
+                left: 15%;
+                animation: floatUp 8s ease-in-out infinite;
+            }
+
+            .dot-2 {
+                top: 60%;
+                right: 20%;
+                animation: floatUp 10s ease-in-out infinite 2s;
+            }
+
+            .dot-3 {
+                bottom: 30%;
+                left: 30%;
+                animation: floatUp 12s ease-in-out infinite 4s;
+            }
+
+            /* Keyframe Animations */
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-20px) rotate(180deg); }
+            }
+
+            @keyframes rotate {
+                from { transform: translate(-50%, -50%) rotate(0deg); }
+                to { transform: translate(-50%, -50%) rotate(360deg); }
+            }
+
+            @keyframes pulse {
+                0%, 100% { 
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: 0.4;
+                }
+                50% { 
+                    transform: translate(-50%, -50%) scale(1.2);
+                    opacity: 0.8;
+                }
+            }
+
+            @keyframes iconFloat {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+
+            @keyframes iconGlow {
+                0% { filter: drop-shadow(0 0 10px #00ffff); }
+                100% { filter: drop-shadow(0 0 20px #00ffff) drop-shadow(0 0 30px #ff00ff); }
+            }
+
+            @keyframes slideInFromLeft {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-100px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes slideInFromRight {
+                0% {
+                    opacity: 0;
+                    transform: translateX(100px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes wordFadeIn {
+                0% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0; }
+            }
+
+            @keyframes floatUp {
+                0%, 100% {
+                    transform: translateY(0px);
+                    opacity: 0.7;
+                }
+                50% {
+                    transform: translateY(-30px);
+                    opacity: 0.3;
+                }
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .welcome-title {
+                    font-size: 2.5rem;
+                }
+                
+                .welcome-subtitle {
+                    font-size: 1.2rem;
+                }
+                
+                .icon-main {
+                    width: 60px;
+                    height: 60px;
+                }
+                
+                .icon-svg {
+                    width: 40px;
+                    height: 40px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .welcome-title {
+                    font-size: 2rem;
+                }
+                
+                .welcome-subtitle {
+                    font-size: 1rem;
+                }
+                
+                .premium-welcome-container {
+                    padding: 1rem;
+                    padding-top: 4rem;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+    }
+
+    // Start welcome screen animations
+    function startWelcomeAnimations() {
+        const welcomeScreen = document.getElementById('welcome-screen');
+        if (!welcomeScreen) return;
+
+        // Add entrance animation
+        welcomeScreen.style.opacity = '0';
+        welcomeScreen.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+            welcomeScreen.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+            welcomeScreen.style.opacity = '1';
+            welcomeScreen.style.transform = 'scale(1)';
+        }, 100);
+
+        // Add interactive hover effects
+        const iconMain = welcomeScreen.querySelector('.icon-main');
+        if (iconMain) {
+            iconMain.addEventListener('mouseenter', () => {
+                iconMain.style.transform = 'scale(1.1) rotate(5deg)';
+                iconMain.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+
+            iconMain.addEventListener('mouseleave', () => {
+                iconMain.style.transform = 'scale(1) rotate(0deg)';
+            });
+        }
+
+        // Add click effect to title
+        const titleLines = welcomeScreen.querySelectorAll('.title-line');
+        titleLines.forEach(line => {
+            line.addEventListener('click', () => {
+                line.style.transform = 'scale(1.05)';
+                line.style.transition = 'transform 0.2s ease';
+                setTimeout(() => {
+                    line.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
     }
 
     function hideWelcomeScreen() {
@@ -3563,7 +5679,7 @@
                 if (inlineDataPart.inlineData.url) {
                     metadata.imageUrl = inlineDataPart.inlineData.url;
                 } else {
-                    metadata.imageUrl = `data:${inlineDataPart.inlineData.mimeType};base64,${inlineDataPart.inlineData.data}`;
+                 metadata.imageUrl = `data:${inlineDataPart.inlineData.mimeType};base64,${inlineDataPart.inlineData.data}`;
                 }
             }
 
@@ -4181,9 +6297,9 @@
             if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 // Try download first
                 try {
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
                 } catch (mobileError) {
                     // Fallback: open in new tab for mobile
                     window.open(imageUrl, '_blank');
