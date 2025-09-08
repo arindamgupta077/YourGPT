@@ -21,6 +21,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Futuristic Theme Variables */
@@ -1528,6 +1529,28 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="m8 12 4 4 4-4"/><path d="M12 16V3"/></svg>
                         Generate Image
                     </button>
+                    
+                    <!-- Authentication Buttons -->
+                    <div id="auth-buttons" class="flex items-center gap-2 ml-4 pl-4 border-l border-gray-600">
+                        <button id="sign-in-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Sign In
+                        </button>
+                        <button id="sign-up-btn" class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Sign Up
+                        </button>
+                    </div>
+                    
+                    <!-- User Profile (hidden by default) -->
+                    <div id="user-profile" class="flex items-center gap-2 ml-4 pl-4 border-l border-gray-600 hidden">
+                        <button id="profile-btn" class="btn-futuristic rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium">
+                            <div class="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            Profile
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Medium screen buttons (icons only) -->
@@ -1552,6 +1575,23 @@
                     <button id="image-gen-btn-md" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-white transition-colors duration-200" title="Generate Image">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="m8 12 4 4 4-4"/><path d="M12 16V3"/></svg>
                     </button>
+                    
+                    <!-- Authentication Buttons for Medium Screens -->
+                    <div id="auth-buttons-md" class="flex items-center gap-1 ml-2 pl-2 border-l border-gray-600">
+                        <button id="sign-in-btn-md" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-white transition-colors duration-200" title="Sign In">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        </button>
+                        <button id="sign-up-btn-md" class="bg-indigo-500 hover:bg-indigo-600 rounded-lg p-2 text-white transition-colors duration-200" title="Sign Up">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </button>
+                    </div>
+                    
+                    <!-- User Profile for Medium Screens (hidden by default) -->
+                    <div id="user-profile-md" class="flex items-center gap-1 ml-2 pl-2 border-l border-gray-600 hidden">
+                        <button id="profile-btn-md" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-white transition-colors duration-200" title="Profile">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Mobile dropdown menu -->
@@ -1582,6 +1622,26 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="m8 12 4 4 4-4"/><path d="M12 16V3"/></svg>
                                 Generate Image
                             </button>
+                            <!-- Authentication Options for Mobile -->
+                            <div id="auth-options-mobile" class="border-t border-gray-600 mt-2 pt-3">
+                                <button id="sign-in-btn-mobile" class="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                                    Sign In
+                                </button>
+                                <button id="sign-up-btn-mobile" class="w-full text-left px-4 py-2 text-indigo-300 hover:bg-indigo-700/30 flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    Sign Up
+                                </button>
+                            </div>
+                            
+                            <!-- User Profile for Mobile (hidden by default) -->
+                            <div id="user-profile-mobile" class="border-t border-gray-600 mt-2 pt-3 hidden">
+                                <button id="profile-btn-mobile" class="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    Profile
+                                </button>
+                            </div>
+                            
                             <button id="install-app-btn-mobile" class="w-full text-left px-4 py-2 text-indigo-300 hover:bg-indigo-700/30 flex items-center gap-3 border-t border-gray-600 mt-2 pt-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7,10 12,15 17,10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                 Install App
@@ -1726,8 +1786,149 @@
         </div>
     </div>
 
+    <!-- Authentication Modals -->
+    <div id="sign-in-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl max-w-md w-full flex flex-col">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-white">Sign In</h3>
+                <button class="close-modal-btn text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-6">
+                <form id="sign-in-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="sign-in-email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" id="sign-in-email" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your email">
+                        </div>
+                        <div>
+                            <label for="sign-in-password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                            <input type="password" id="sign-in-password" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your password">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 rounded-lg p-3 text-lg font-semibold transition-colors duration-200">Sign In</button>
+                    </div>
+                </form>
+                <div class="mt-4 text-center space-y-2">
+                    <p class="text-gray-400 text-sm">Don't have an account? <button id="switch-to-signup" class="text-indigo-400 hover:text-indigo-300">Sign up</button></p>
+                    <p class="text-gray-400 text-sm"><button id="forgot-password-btn" class="text-indigo-400 hover:text-indigo-300">Forgot your password?</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sign-up-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl max-w-md w-full flex flex-col">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-white">Sign Up</h3>
+                <button class="close-modal-btn text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-6">
+                <form id="sign-up-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="sign-up-name" class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                            <input type="text" id="sign-up-name" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your full name">
+                        </div>
+                        <div>
+                            <label for="sign-up-email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" id="sign-up-email" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your email">
+                        </div>
+                        <div>
+                            <label for="sign-up-password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                            <input type="password" id="sign-up-password" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Create a password">
+                        </div>
+                        <div>
+                            <label for="sign-up-confirm-password" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                            <input type="password" id="sign-up-confirm-password" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Confirm your password">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 rounded-lg p-3 text-lg font-semibold transition-colors duration-200">Sign Up</button>
+                    </div>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-400 text-sm">Already have an account? <button id="switch-to-signin" class="text-indigo-400 hover:text-indigo-300">Sign in</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl max-w-md w-full flex flex-col">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-white">Reset Password</h3>
+                <button class="close-modal-btn text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-6">
+                <form id="forgot-password-form">
+                    <div class="space-y-4">
+                        <p class="text-gray-300 text-sm mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+                        <div>
+                            <label for="forgot-password-email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" id="forgot-password-email" required class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your email">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 rounded-lg p-3 text-lg font-semibold transition-colors duration-200">Send Reset Link</button>
+                    </div>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-400 text-sm">Remember your password? <button id="switch-to-signin-from-forgot" class="text-indigo-400 hover:text-indigo-300">Sign in</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="modal-content bg-gray-800 rounded-2xl shadow-xl max-w-md w-full flex flex-col">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-white">Profile</h3>
+                <button class="close-modal-btn text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <div>
+                            <h4 id="profile-name" class="text-lg font-semibold text-white">User Name</h4>
+                            <p id="profile-email" class="text-gray-400">user@example.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                            <input type="text" id="profile-name-input" class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your full name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" id="profile-email-input" class="w-full bg-gray-700 rounded-lg p-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your email">
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button id="update-profile-btn" class="flex-1 bg-indigo-500 hover:bg-indigo-600 rounded-lg p-3 text-white font-medium transition-colors duration-200">Update Profile</button>
+                        <button id="change-password-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 rounded-lg p-3 text-white font-medium transition-colors duration-200">Change Password</button>
+                    </div>
+                    
+                    <div class="pt-4 border-t border-gray-700">
+                        <button id="sign-out-from-profile-btn" class="w-full bg-red-500 hover:bg-red-600 rounded-lg p-3 text-white font-medium transition-colors duration-200">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://wapjatvksqdukowojkpv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhcGphdHZrc3FkdWtvd29qa3B2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMjYxNDIsImV4cCI6MjA3MjkwMjE0Mn0.RvJ5ID71LAqExetKRgbkQUZny3yUs7uMm_jY8LR5Xc4';
+    
+    // Initialize Supabase client
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Authentication state
+    let currentUser = null;
+
     const chatContainer = document.getElementById('chat-container');
     const chatForm = document.getElementById('chat-form');
     const messageInput = document.getElementById('message-input');
@@ -1820,6 +2021,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         loadChatsFromLocalStorage();
         populatePersonas();
+        initAuth(); // Initialize authentication
     });
 
     // --- EVENT LISTENERS ---
@@ -1950,6 +2152,41 @@
     personaBtnMd.addEventListener('click', () => personaModal.classList.add('active'));
     emailDraftBtnMd.addEventListener('click', () => emailModal.classList.add('active'));
     codeHelperBtnMd.addEventListener('click', () => codeHelperModal.classList.add('active'));
+    
+    // Authentication button event listeners
+    const signInBtn = document.getElementById('sign-in-btn');
+    const signUpBtn = document.getElementById('sign-up-btn');
+    const signInBtnMd = document.getElementById('sign-in-btn-md');
+    const signUpBtnMd = document.getElementById('sign-up-btn-md');
+    const signInBtnMobile = document.getElementById('sign-in-btn-mobile');
+    const signUpBtnMobile = document.getElementById('sign-up-btn-mobile');
+    const profileBtn = document.getElementById('profile-btn');
+    const profileBtnMd = document.getElementById('profile-btn-md');
+    const profileBtnMobile = document.getElementById('profile-btn-mobile');
+    
+    // Desktop auth buttons
+    if (signInBtn) signInBtn.addEventListener('click', () => document.getElementById('sign-in-modal').classList.add('active'));
+    if (signUpBtn) signUpBtn.addEventListener('click', () => document.getElementById('sign-up-modal').classList.add('active'));
+    if (profileBtn) profileBtn.addEventListener('click', () => document.getElementById('profile-modal').classList.add('active'));
+    
+    // Medium screen auth buttons
+    if (signInBtnMd) signInBtnMd.addEventListener('click', () => document.getElementById('sign-in-modal').classList.add('active'));
+    if (signUpBtnMd) signUpBtnMd.addEventListener('click', () => document.getElementById('sign-up-modal').classList.add('active'));
+    if (profileBtnMd) profileBtnMd.addEventListener('click', () => document.getElementById('profile-modal').classList.add('active'));
+    
+    // Mobile auth buttons
+    if (signInBtnMobile) signInBtnMobile.addEventListener('click', () => {
+        document.getElementById('sign-in-modal').classList.add('active');
+        mobileMenu.classList.add('hidden');
+    });
+    if (signUpBtnMobile) signUpBtnMobile.addEventListener('click', () => {
+        document.getElementById('sign-up-modal').classList.add('active');
+        mobileMenu.classList.add('hidden');
+    });
+    if (profileBtnMobile) profileBtnMobile.addEventListener('click', () => {
+        document.getElementById('profile-modal').classList.add('active');
+        mobileMenu.classList.add('hidden');
+    });
     
     // Mobile menu functionality
     mobileMenuBtn.addEventListener('click', () => {
@@ -2236,6 +2473,171 @@
     emailForm.addEventListener('submit', handleEmailDrafting);
     codeHelperForm.addEventListener('submit', handleCodeGeneration);
     suggestPromptsBtn.addEventListener('click', handleSuggestPrompts);
+    
+    // Authentication form handlers
+    const signInForm = document.getElementById('sign-in-form');
+    const signUpForm = document.getElementById('sign-up-form');
+    const switchToSignupBtn = document.getElementById('switch-to-signup');
+    const switchToSigninBtn = document.getElementById('switch-to-signin');
+    
+    if (signInForm) {
+        signInForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('sign-in-email').value;
+            const password = document.getElementById('sign-in-password').value;
+            
+            const result = await signIn(email, password);
+            if (result.success) {
+                document.getElementById('sign-in-modal').classList.remove('active');
+                signInForm.reset();
+            } else {
+                alert('Sign in failed: ' + result.error);
+            }
+        });
+    }
+    
+    if (signUpForm) {
+        signUpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('sign-up-name').value;
+            const email = document.getElementById('sign-up-email').value;
+            const password = document.getElementById('sign-up-password').value;
+            const confirmPassword = document.getElementById('sign-up-confirm-password').value;
+            
+            if (!fullName.trim()) {
+                alert('Please enter your full name');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+            
+            const result = await signUp(email, password, fullName);
+            if (result.success) {
+                document.getElementById('sign-up-modal').classList.remove('active');
+                signUpForm.reset();
+            } else {
+                alert('Sign up failed: ' + result.error);
+            }
+        });
+    }
+    
+    // Modal switching
+    if (switchToSignupBtn) {
+        switchToSignupBtn.addEventListener('click', () => {
+            document.getElementById('sign-in-modal').classList.remove('active');
+            document.getElementById('sign-up-modal').classList.add('active');
+        });
+    }
+    
+    if (switchToSigninBtn) {
+        switchToSigninBtn.addEventListener('click', () => {
+            document.getElementById('sign-up-modal').classList.remove('active');
+            document.getElementById('sign-in-modal').classList.add('active');
+        });
+    }
+    
+    // Forgot password functionality
+    const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+    const forgotPasswordForm = document.getElementById('forgot-password-form');
+    const switchToSigninFromForgotBtn = document.getElementById('switch-to-signin-from-forgot');
+    
+    if (forgotPasswordBtn) {
+        forgotPasswordBtn.addEventListener('click', () => {
+            document.getElementById('sign-in-modal').classList.remove('active');
+            document.getElementById('forgot-password-modal').classList.add('active');
+        });
+    }
+    
+    if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgot-password-email').value;
+            
+            const result = await resetPassword(email);
+            if (result.success) {
+                alert('Password reset link sent to your email!');
+                document.getElementById('forgot-password-modal').classList.remove('active');
+                forgotPasswordForm.reset();
+            } else {
+                alert('Failed to send reset link: ' + result.error);
+            }
+        });
+    }
+    
+    if (switchToSigninFromForgotBtn) {
+        switchToSigninFromForgotBtn.addEventListener('click', () => {
+            document.getElementById('forgot-password-modal').classList.remove('active');
+            document.getElementById('sign-in-modal').classList.add('active');
+        });
+    }
+    
+    // Profile functionality
+    const updateProfileBtn = document.getElementById('update-profile-btn');
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const signOutFromProfileBtn = document.getElementById('sign-out-from-profile-btn');
+    
+    if (updateProfileBtn) {
+        updateProfileBtn.addEventListener('click', async () => {
+            const newName = document.getElementById('profile-name-input').value;
+            const newEmail = document.getElementById('profile-email-input').value;
+            
+            if (!newName.trim()) {
+                alert('Please enter your full name');
+                return;
+            }
+            
+            try {
+                const { error } = await supabase.auth.updateUser({
+                    email: newEmail,
+                    data: { full_name: newName }
+                });
+                
+                if (error) throw error;
+                
+                alert('Profile updated successfully!');
+                document.getElementById('profile-modal').classList.remove('active');
+            } catch (error) {
+                alert('Failed to update profile: ' + error.message);
+            }
+        });
+    }
+    
+    if (changePasswordBtn) {
+        changePasswordBtn.addEventListener('click', () => {
+            alert('Password change functionality will be implemented in a future update.');
+        });
+    }
+    
+    if (signOutFromProfileBtn) {
+        signOutFromProfileBtn.addEventListener('click', async () => {
+            const result = await signOut();
+            if (result.success) {
+                document.getElementById('profile-modal').classList.remove('active');
+            } else {
+                alert('Sign out failed: ' + result.error);
+            }
+        });
+    }
+    
+    // Load profile data when modal opens
+    document.getElementById('profile-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'profile-modal' || e.target.classList.contains('close-modal-btn')) {
+            if (currentUser) {
+                document.getElementById('profile-name').textContent = currentUser.user_metadata?.full_name || 'User';
+                document.getElementById('profile-email').textContent = currentUser.email;
+                document.getElementById('profile-name-input').value = currentUser.user_metadata?.full_name || '';
+                document.getElementById('profile-email-input').value = currentUser.email;
+            }
+        }
+    });
     attachImageBtn.addEventListener('click', () => imageUploadInput.click());
     imageUploadInput.addEventListener('change', handleImageFileSelect);
     removeImageBtn.addEventListener('click', clearImageAttachment);
@@ -2481,7 +2883,7 @@
             const timestamp = Date.now();
             addMessageToChat('bot', botMessage, {}, timestamp);
             chatHistory.push({ role: 'model', parts: [{ text: botMessage }], timestamp });
-            saveCurrentChat();
+            await saveCurrentChat();
         } else {
             const errorMessage = "I'm sorry, I couldn't generate a response. Please try again.";
             const timestamp = Date.now();
@@ -2492,37 +2894,77 @@
     }
 
     // --- CHAT HISTORY MANAGEMENT ---
-    function saveCurrentChat() {
+    async function saveCurrentChat() {
         if (chatHistory.length === 0) return;
 
-        if (activeChatId) {
-            const chat = savedChats.find(c => c.id === activeChatId);
-            if (chat) {
-                 chat.history = chatHistory;
-                 chat.systemInstruction = activeSystemInstruction;
+        if (currentUser) {
+            // Save to Supabase for authenticated users
+            if (activeChatId) {
+                // Update existing chat
+                const chat = savedChats.find(c => c.id === activeChatId);
+                if (chat) {
+                    chat.history = chatHistory;
+                    chat.systemInstruction = activeSystemInstruction;
+                    await updateChatInSupabase(activeChatId, chat);
+                }
+            } else {
+                // Create new chat
+                const firstUserMessagePart = chatHistory.find(m => m.role === 'user')?.parts?.find(p => p.text);
+                const title = firstUserMessagePart ? firstUserMessagePart.text : "New Chat";
+                const newChat = {
+                    title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
+                    history: chatHistory,
+                    systemInstruction: activeSystemInstruction
+                };
+                
+                const savedChat = await saveChatToSupabase(newChat);
+                if (savedChat) {
+                    savedChats.unshift({
+                        id: savedChat.id,
+                        title: savedChat.title,
+                        history: savedChat.history,
+                        systemInstruction: savedChat.system_instruction,
+                        timestamp: new Date(savedChat.updated_at).getTime()
+                    });
+                    activeChatId = savedChat.id;
+                }
             }
         } else {
-            const firstUserMessagePart = chatHistory.find(m => m.role === 'user').parts.find(p => p.text);
-            const title = firstUserMessagePart ? firstUserMessagePart.text : "Image Analysis";
-            const newChat = {
-                id: Date.now(),
-                title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
-                history: chatHistory,
-                systemInstruction: activeSystemInstruction
-            };
-            savedChats.unshift(newChat);
-            activeChatId = newChat.id;
+            // Fallback to localStorage for non-authenticated users
+            if (activeChatId) {
+                const chat = savedChats.find(c => c.id === activeChatId);
+                if (chat) {
+                     chat.history = chatHistory;
+                     chat.systemInstruction = activeSystemInstruction;
+                }
+            } else {
+                const firstUserMessagePart = chatHistory.find(m => m.role === 'user')?.parts?.find(p => p.text);
+                const title = firstUserMessagePart ? firstUserMessagePart.text : "New Chat";
+                const newChat = {
+                    id: Date.now(),
+                    title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
+                    history: chatHistory,
+                    systemInstruction: activeSystemInstruction
+                };
+                savedChats.unshift(newChat);
+                activeChatId = newChat.id;
+            }
+            
+            localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
         }
-        localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
         renderChatHistory();
     }
     
     function loadChatsFromLocalStorage() {
-        const chats = localStorage.getItem('yourGptChats');
-        if (chats) {
-            savedChats = JSON.parse(chats);
-            renderChatHistory();
+        // Only load from localStorage if user is not authenticated
+        if (!currentUser) {
+            const chats = localStorage.getItem('yourGptChats');
+            if (chats) {
+                savedChats = JSON.parse(chats);
+                renderChatHistory();
+            }
         }
+        // For authenticated users, chats are loaded via loadUserChats() in initAuth()
     }
 
     function renderChatHistory() {
@@ -2629,7 +3071,12 @@
             const inlineDataPart = turn.parts.find(p => p.inlineData);
             const metadata = {};
             if(inlineDataPart){
-                 metadata.imageUrl = `data:${inlineDataPart.inlineData.mimeType};base64,${inlineDataPart.inlineData.data}`;
+                // Use saved URL if available, otherwise use base64 data
+                if (inlineDataPart.inlineData.url) {
+                    metadata.imageUrl = inlineDataPart.inlineData.url;
+                } else {
+                    metadata.imageUrl = `data:${inlineDataPart.inlineData.mimeType};base64,${inlineDataPart.inlineData.data}`;
+                }
             }
 
             const sender = turn.role === 'user' ? 'user' : 'bot';
@@ -2638,9 +3085,21 @@
         renderChatHistory();
     }
     
-    function deleteChat(chatId) {
-        savedChats = savedChats.filter(c => c.id !== chatId);
-        localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
+    async function deleteChat(chatId) {
+        if (currentUser) {
+            // Delete from Supabase for authenticated users
+            const success = await deleteChatFromSupabase(chatId);
+            if (success) {
+                savedChats = savedChats.filter(c => c.id !== chatId);
+            } else {
+                alert('Failed to delete chat. Please try again.');
+                return;
+            }
+        } else {
+            // Delete from localStorage for non-authenticated users
+            savedChats = savedChats.filter(c => c.id !== chatId);
+            localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
+        }
         
         if (activeChatId === chatId) {
             startNewChat();
@@ -2759,11 +3218,11 @@
         }
     }
 
-    function selectPersona(name) {
+    async function selectPersona(name) {
         activeSystemInstruction = personas[name].instruction;
         updatePersonaIndicator();
         personaModal.classList.remove('active');
-        if (chatHistory.length > 0) saveCurrentChat();
+        if (chatHistory.length > 0) await saveCurrentChat();
     }
 
     function updatePersonaIndicator() {
@@ -2810,7 +3269,7 @@
             const messageIndex = chatHistory.findIndex(m => m.timestamp == timestamp);
             if (messageIndex !== -1) {
                 chatHistory[messageIndex].parts[0].text = refinedText;
-                saveCurrentChat();
+                await saveCurrentChat();
             }
         } else {
             proseDiv.innerHTML = marked.parse(originalText); // Restore original on failure
@@ -3137,10 +3596,19 @@
             addMessageToChat('user', userMessage, {}, userTimestamp);
             addMessageToChat('bot', botMessage, { imageUrl }, botTimestamp);
             
+            // Save image to Supabase if user is authenticated
+            let savedImageUrl = imageUrl;
+            if (currentUser && activeChatId) {
+                const savedUrl = await saveImageToSupabase(imageUrl, activeChatId, botTimestamp);
+                if (savedUrl) {
+                    savedImageUrl = savedUrl;
+                }
+            }
+            
             chatHistory.push({ role: 'user', parts: [{ text: userMessage }], timestamp: userTimestamp });
-            chatHistory.push({ role: 'model', parts: [{ text: botMessage }, { inlineData: { mimeType: 'image/png', data: base64Data } }], timestamp: botTimestamp });
+            chatHistory.push({ role: 'model', parts: [{ text: botMessage }, { inlineData: { mimeType: 'image/png', data: base64Data, url: savedImageUrl } }], timestamp: botTimestamp });
 
-            saveCurrentChat();
+            await saveCurrentChat();
             
             imageModal.classList.remove('active');
             imagePromptInput.value = '';
@@ -3288,6 +3756,268 @@
             setTimeout(() => {
                 button.innerHTML = originalHTML;
             }, 2000);
+        }
+    }
+
+    // Authentication Functions
+    async function signUp(email, password, fullName) {
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName
+                    }
+                }
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            if (data.user && !data.user.email_confirmed_at) {
+                alert('Please check your email for a confirmation link to complete your registration.');
+            }
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Sign up error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async function resetPassword(email) {
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/reset-password'
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            return { success: true };
+        } catch (error) {
+            console.error('Reset password error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async function signIn(email, password) {
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Sign in error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async function signOut() {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                throw error;
+            }
+            return { success: true };
+        } catch (error) {
+            console.error('Sign out error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    function updateAuthUI(user) {
+        const authButtons = document.getElementById('auth-buttons');
+        const authButtonsMd = document.getElementById('auth-buttons-md');
+        const authOptionsMobile = document.getElementById('auth-options-mobile');
+        const userProfile = document.getElementById('user-profile');
+        const userProfileMd = document.getElementById('user-profile-md');
+        const userProfileMobile = document.getElementById('user-profile-mobile');
+
+        if (user) {
+            // User is signed in
+            if (authButtons) authButtons.classList.add('hidden');
+            if (authButtonsMd) authButtonsMd.classList.add('hidden');
+            if (authOptionsMobile) authOptionsMobile.classList.add('hidden');
+            
+            if (userProfile) userProfile.classList.remove('hidden');
+            if (userProfileMd) userProfileMd.classList.remove('hidden');
+            if (userProfileMobile) userProfileMobile.classList.remove('hidden');
+        } else {
+            // User is signed out
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (authButtonsMd) authButtonsMd.classList.remove('hidden');
+            if (authOptionsMobile) authOptionsMobile.classList.remove('hidden');
+            
+            if (userProfile) userProfile.classList.add('hidden');
+            if (userProfileMd) userProfileMd.classList.add('hidden');
+            if (userProfileMobile) userProfileMobile.classList.add('hidden');
+        }
+    }
+
+    // Initialize authentication state
+    async function initAuth() {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            currentUser = session?.user || null;
+            updateAuthUI(currentUser);
+
+            // Listen for auth changes
+            supabase.auth.onAuthStateChange((event, session) => {
+                currentUser = session?.user || null;
+                updateAuthUI(currentUser);
+                
+                // Load user's chat history when they sign in
+                if (currentUser) {
+                    loadUserChats();
+                } else {
+                    // Clear chat history when user signs out
+                    chatContainer.innerHTML = '';
+                    chatHistory = [];
+                    savedChats = [];
+                    renderChatHistory();
+                }
+            });
+        } catch (error) {
+            console.error('Auth initialization error:', error);
+        }
+    }
+
+    // Supabase Database Functions for Chat Data
+    async function saveChatToSupabase(chatData) {
+        if (!currentUser) return null;
+        
+        try {
+            const { data, error } = await supabase
+                .from('chats')
+                .insert({
+                    user_id: currentUser.id,
+                    title: chatData.title,
+                    history: chatData.history,
+                    system_instruction: chatData.systemInstruction,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error saving chat to Supabase:', error);
+            return null;
+        }
+    }
+
+    async function updateChatInSupabase(chatId, chatData) {
+        if (!currentUser) return null;
+        
+        try {
+            const { data, error } = await supabase
+                .from('chats')
+                .update({
+                    title: chatData.title,
+                    history: chatData.history,
+                    system_instruction: chatData.systemInstruction,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', chatId)
+                .eq('user_id', currentUser.id)
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error updating chat in Supabase:', error);
+            return null;
+        }
+    }
+
+    async function loadUserChats() {
+        if (!currentUser) return;
+        
+        try {
+            const { data, error } = await supabase
+                .from('chats')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('updated_at', { ascending: false });
+
+            if (error) throw error;
+            
+            // Convert Supabase data to our chat format
+            savedChats = data.map(chat => ({
+                id: chat.id,
+                title: chat.title,
+                history: chat.history,
+                systemInstruction: chat.system_instruction,
+                timestamp: new Date(chat.updated_at).getTime()
+            }));
+            
+            renderChatHistory();
+        } catch (error) {
+            console.error('Error loading user chats:', error);
+        }
+    }
+
+    async function deleteChatFromSupabase(chatId) {
+        if (!currentUser) return false;
+        
+        try {
+            const { error } = await supabase
+                .from('chats')
+                .delete()
+                .eq('id', chatId)
+                .eq('user_id', currentUser.id);
+
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('Error deleting chat from Supabase:', error);
+            return false;
+        }
+    }
+
+    async function saveImageToSupabase(imageData, chatId, messageId) {
+        if (!currentUser) return null;
+        
+        try {
+            // Convert base64 to blob
+            const response = await fetch(imageData);
+            const blob = await response.blob();
+            
+            // Create a unique filename
+            const fileName = `chat-${chatId}-${messageId}-${Date.now()}.png`;
+            
+            // Upload to Supabase Storage
+            const { data, error } = await supabase.storage
+                .from('chat-images')
+                .upload(fileName, blob, {
+                    contentType: 'image/png',
+                    upsert: false
+                });
+
+            if (error) throw error;
+            
+            // Get public URL
+            const { data: urlData } = supabase.storage
+                .from('chat-images')
+                .getPublicUrl(fileName);
+            
+            return urlData.publicUrl;
+        } catch (error) {
+            console.error('Error saving image to Supabase:', error);
+            return null;
         }
     }
 
