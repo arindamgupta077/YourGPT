@@ -360,6 +360,46 @@
                 transition: all 0.3s ease;
             }
             
+            /* Mobile modal input fields - Enhanced visibility */
+            .modal-content input {
+                font-size: 18px !important; /* Larger font for better visibility */
+                min-height: 56px !important; /* Increased height */
+                padding: 16px 20px !important; /* More padding */
+                line-height: 1.4 !important; /* Better line height */
+            }
+            
+            /* Mobile modal input placeholders */
+            .modal-content input::placeholder {
+                font-size: 16px !important; /* Slightly smaller placeholder */
+                color: rgba(156, 163, 175, 0.8) !important; /* Better contrast */
+            }
+            
+            /* Mobile modal input labels */
+            .modal-content label {
+                font-size: 16px !important; /* Larger labels */
+                margin-bottom: 8px !important; /* More spacing */
+            }
+            
+            /* Mobile modal input icons */
+            .modal-content .absolute.inset-y-0.left-0 {
+                padding-left: 16px !important; /* Better icon positioning */
+            }
+            
+            .modal-content .absolute.inset-y-0.left-0 svg {
+                width: 20px !important; /* Larger icons */
+                height: 20px !important;
+            }
+            
+            /* Mobile modal input text color */
+            .modal-content input {
+                color: #ffffff !important; /* Better text contrast */
+            }
+            
+            /* Mobile modal spacing */
+            .modal-content .space-y-6 > * + * {
+                margin-top: 24px !important; /* More spacing between fields */
+            }
+            
             /* Mobile input focus state */
             input:focus, textarea:focus {
                 outline: none;
@@ -379,6 +419,29 @@
                 min-height: 48px !important;
                 min-width: 48px !important;
                 padding: 12px !important;
+            }
+            
+            /* Mobile labels for action buttons */
+            .mobile-label {
+                display: block !important;
+                color: var(--text-secondary);
+                font-size: 10px;
+                line-height: 1;
+                margin-top: 2px;
+                text-align: center;
+                white-space: nowrap;
+            }
+            
+            /* Adjust button layout for mobile with labels */
+            .copy-btn, .fact-check-btn, .refine-btn, .tts-btn {
+                min-height: 60px !important;
+                min-width: 50px !important;
+                padding: 8px 6px !important;
+            }
+            
+            /* Make action buttons always visible on mobile */
+            .absolute.-bottom-3.-right-3 {
+                opacity: 1 !important;
             }
             
             /* Mobile sidebar */
@@ -1142,17 +1205,25 @@
             
             /* Mobile sidebar button styling */
             #mobile-sidebar-btn {
-                min-width: 44px;
-                min-height: 44px;
-                display: flex;
+                min-width: 48px;
+                min-height: 48px;
+                display: flex !important;
                 align-items: center;
-                justify-content: flex-start;
+                justify-content: center;
                 z-index: 200 !important;
                 position: relative;
-                background-color: rgba(0, 0, 0, 0.1);
+                background-color: rgba(0, 0, 0, 0.3);
                 backdrop-filter: blur(4px);
                 border-radius: 8px;
+                touch-action: manipulation;
+                -webkit-touch-callout: none;
+                user-select: none;
+                -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
                 transition: all 0.2s ease;
+                cursor: pointer;
+                pointer-events: auto !important;
+                opacity: 1 !important;
+                visibility: visible !important;
             }
             
             
@@ -1754,22 +1825,47 @@
             
             /* Delete buttons mobile styling */
             .delete-chat-btn {
-                min-width: 44px;
-                min-height: 44px;
+                min-width: 48px;
+                min-height: 48px;
                 touch-action: manipulation;
                 opacity: 1 !important; /* Always visible on mobile */
-                background-color: rgba(239, 68, 68, 0.1); /* Subtle red background */
-                border: 1px solid rgba(239, 68, 68, 0.2);
+                background-color: rgba(239, 68, 68, 0.15); /* More visible red background */
+                border: 1px solid rgba(239, 68, 68, 0.3);
+                border-radius: 8px;
+                -webkit-tap-highlight-color: rgba(239, 68, 68, 0.4);
+                -webkit-touch-callout: none;
+                user-select: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            
+            .delete-chat-btn .delete-icon {
+                color: #ef4444;
+                transition: all 0.2s ease;
             }
             
             .delete-chat-btn:hover {
-                background-color: rgba(239, 68, 68, 0.2);
-                border-color: rgba(239, 68, 68, 0.4);
+                background-color: rgba(239, 68, 68, 0.25);
+                border-color: rgba(239, 68, 68, 0.5);
+                box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+            }
+            
+            .delete-chat-btn:hover .delete-icon {
+                color: #dc2626;
+                transform: scale(1.1);
             }
             
             .delete-chat-btn:active {
                 transform: scale(0.95);
-                background-color: rgba(239, 68, 68, 0.3);
+                background-color: rgba(239, 68, 68, 0.35);
+                box-shadow: 0 1px 2px rgba(239, 68, 68, 0.3);
+            }
+            
+            .delete-chat-btn:active .delete-icon {
+                transform: scale(0.9);
             }
             
             #bulk-delete-btn {
@@ -1780,6 +1876,38 @@
             /* Make delete buttons always visible on mobile */
             .group .delete-chat-btn {
                 opacity: 1 !important;
+                margin-left: 8px;
+            }
+            
+            /* Enhanced mobile delete button accessibility */
+            .delete-chat-btn:focus {
+                outline: 2px solid rgba(239, 68, 68, 0.6);
+                outline-offset: 2px;
+            }
+            
+            /* Better spacing for mobile chat items */
+            .group {
+                padding: 12px 16px;
+                margin-bottom: 4px;
+            }
+            
+            /* Mobile chat history item styling */
+            .group {
+                min-height: 48px;
+                touch-action: manipulation;
+                -webkit-touch-callout: none;
+                user-select: none;
+                cursor: pointer;
+                -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .group:hover {
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+            
+            .group:active {
+                background-color: rgba(255, 255, 255, 0.1);
+                transform: scale(0.98);
             }
         }
         
@@ -1787,11 +1915,86 @@
         @media (min-width: 769px) {
             .delete-chat-btn {
                 opacity: 0;
-                transition: opacity 0.2s ease;
+                transition: all 0.2s ease;
+                min-width: 40px;
+                min-height: 40px;
+                background-color: rgba(239, 68, 68, 0.1);
+                border: 1px solid rgba(239, 68, 68, 0.2);
+                border-radius: 6px;
             }
             
             .group:hover .delete-chat-btn {
                 opacity: 1;
+                background-color: rgba(239, 68, 68, 0.15);
+                border-color: rgba(239, 68, 68, 0.3);
+            }
+            
+            .delete-chat-btn .delete-icon {
+                width: 18px;
+                height: 18px;
+                color: #ef4444;
+            }
+            
+            /* Hide mobile labels on desktop */
+            .mobile-label {
+                display: none !important;
+            }
+            
+            /* Reset button sizes for desktop */
+            .copy-btn, .fact-check-btn, .refine-btn, .tts-btn {
+                min-height: 32px !important;
+                min-width: 32px !important;
+                padding: 8px !important;
+            }
+            
+            /* Reset bot message spacing for desktop */
+            .message-bubble.bot-message .group > div:last-child {
+                padding-bottom: 12px !important;
+                margin-bottom: 0 !important;
+            }
+            
+            .message-bubble.bot-message {
+                margin-bottom: 16px !important;
+            }
+            
+            .message-bubble.bot-message .prose {
+                padding-right: 0 !important;
+            }
+            
+            .message-bubble.bot-message .absolute.-bottom-3.-right-3 {
+                bottom: -12px !important;
+                right: -12px !important;
+            }
+            
+            /* Reset modal input styles for desktop */
+            .modal-content input {
+                font-size: 16px !important;
+                min-height: 48px !important;
+                padding: 12px 16px !important;
+                line-height: 1.5 !important;
+            }
+            
+            .modal-content input::placeholder {
+                font-size: 14px !important;
+                color: rgba(156, 163, 175, 0.6) !important;
+            }
+            
+            .modal-content label {
+                font-size: 14px !important;
+                margin-bottom: 6px !important;
+            }
+            
+            .modal-content .absolute.inset-y-0.left-0 {
+                padding-left: 12px !important;
+            }
+            
+            .modal-content .absolute.inset-y-0.left-0 svg {
+                width: 18px !important;
+                height: 18px !important;
+            }
+            
+            .modal-content .space-y-6 > * + * {
+                margin-top: 24px !important;
             }
         }
         
@@ -1804,6 +2007,28 @@
             max-width: calc(100vw - 80px);
             word-wrap: break-word;
             overflow-wrap: break-word;
+        }
+        
+        /* Increase bot message card size on mobile to accommodate action buttons */
+        .message-bubble.bot-message .group > div:last-child {
+            padding-bottom: 50px !important; /* Add space for action buttons */
+            margin-bottom: 20px !important; /* Additional margin for button clearance */
+        }
+        
+        /* Ensure action buttons have proper spacing on mobile */
+        .message-bubble.bot-message .absolute.-bottom-3.-right-3 {
+            bottom: 8px !important;
+            right: 8px !important;
+        }
+        
+        /* Additional mobile spacing for better button visibility */
+        .message-bubble.bot-message {
+            margin-bottom: 30px !important; /* Extra space between messages */
+        }
+        
+        /* Ensure action buttons don't overlap with content */
+        .message-bubble.bot-message .prose {
+            padding-right: 10px !important; /* Prevent text from getting too close to buttons */
         }
         
         /* Mobile input improvements - Enhanced */
@@ -3555,35 +3780,230 @@
     let sidebarStartX = 0;
     let sidebarUsageCount = 0;
     
-    // Open sidebar
+    // Open sidebar with improved mobile support
     if (mobileSidebarBtn) {
+        let touchHandled = false;
+        
+        // Click event for desktop
         mobileSidebarBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             console.log('Mobile sidebar button clicked'); // Debug log
-            sidebar.classList.remove('-translate-x-full');
-            sidebarOverlay.classList.remove('hidden');
-            document.body.classList.add('sidebar-open');
             
-            // Track sidebar usage and hide hint after 3 uses
-            sidebarUsageCount++;
-            const swipeHint = document.getElementById('swipe-hint');
-            if (swipeHint && sidebarUsageCount > 3) {
-                swipeHint.style.display = 'none';
+            if (!touchHandled) {
+                openSidebar();
+            }
+        });
+        
+        // Touch events for mobile
+        mobileSidebarBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            touchHandled = false;
+            console.log('Mobile sidebar button touch start'); // Debug log
+        });
+        
+        mobileSidebarBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Mobile sidebar button touch end'); // Debug log
+            
+            if (!touchHandled) {
+                touchHandled = true;
+                openSidebar();
             }
         });
     }
     
+    // Unified function to open sidebar
+    function openSidebar() {
+        console.log('Opening sidebar...'); // Debug log
+        console.log('Sidebar element:', sidebar);
+        console.log('Sidebar overlay:', sidebarOverlay);
+        
+        if (sidebar) {
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            console.log('Sidebar classes after opening:', sidebar.className);
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.classList.remove('hidden');
+            console.log('Sidebar overlay classes after opening:', sidebarOverlay.className);
+        }
+        
+        document.body.classList.add('sidebar-open');
+        
+        // Track sidebar usage and hide hint after 3 uses
+        sidebarUsageCount++;
+        const swipeHint = document.getElementById('swipe-hint');
+        if (swipeHint && sidebarUsageCount > 3) {
+            swipeHint.style.display = 'none';
+        }
+        
+        console.log('Sidebar should now be open');
+    }
+    
+    // Global function for debugging mobile sidebar
+    window.debugMobileSidebar = function() {
+        console.log('=== Mobile Sidebar Debug ===');
+        console.log('Mobile sidebar button:', mobileSidebarBtn);
+        console.log('Sidebar element:', sidebar);
+        console.log('Sidebar overlay:', sidebarOverlay);
+        console.log('Button visible:', mobileSidebarBtn ? mobileSidebarBtn.offsetParent !== null : false);
+        console.log('Button classes:', mobileSidebarBtn ? mobileSidebarBtn.className : 'N/A');
+        console.log('Sidebar classes:', sidebar ? sidebar.className : 'N/A');
+        console.log('Overlay classes:', sidebarOverlay ? sidebarOverlay.className : 'N/A');
+        console.log('Body classes:', document.body.className);
+        console.log('Window width:', window.innerWidth);
+        console.log('Is mobile:', window.innerWidth <= 768);
+        
+        // Try to open sidebar programmatically
+        if (sidebar && sidebarOverlay) {
+            console.log('Attempting to open sidebar programmatically...');
+            openSidebar();
+        }
+    };
+    
+    // Make openSidebar globally available for debugging
+    window.openSidebar = openSidebar;
+    
+    // Global function for debugging swipe functionality
+    window.debugSwipe = function() {
+        console.log('=== Enhanced Swipe Debug ===');
+        console.log('Sidebar element:', sidebar);
+        console.log('Sidebar overlay:', sidebarOverlay);
+        console.log('Sidebar classes:', sidebar ? sidebar.className : 'N/A');
+        console.log('Overlay classes:', sidebarOverlay ? sidebarOverlay.className : 'N/A');
+        console.log('Global dragging:', isGlobalDragging);
+        console.log('Global touch start X:', globalTouchStartX);
+        console.log('Global touch start Y:', globalTouchStartY);
+        console.log('Window width:', window.innerWidth);
+        console.log('Is mobile:', window.innerWidth <= 768);
+        
+        // Test if sidebar is open
+        const isSidebarOpen = sidebar && (!sidebar.classList.contains('-translate-x-full') || 
+                                         sidebar.classList.contains('translate-x-0') ||
+                                         (sidebarOverlay && !sidebarOverlay.classList.contains('hidden')));
+        console.log('Is sidebar open:', isSidebarOpen);
+        
+        // Test swipe detection manually
+        console.log('Testing swipe detection...');
+        if (isSidebarOpen) {
+            console.log('Sidebar is open - swipe left should work');
+            console.log('Try swiping left anywhere on the screen');
+        } else {
+            console.log('Sidebar is closed - open it first to test swipe');
+        }
+    };
+    
+    // Global function to test New Chat functionality
+    window.testNewChatAndClose = function() {
+        console.log('=== Testing New Chat and Close ===');
+        console.log('Opening sidebar first...');
+        openSidebar();
+        
+        setTimeout(() => {
+            console.log('Testing New Chat button...');
+            const newChatBtn = document.getElementById('new-chat-sidebar-btn');
+            if (newChatBtn) {
+                console.log('New Chat button found, clicking...');
+                newChatBtn.click();
+            } else {
+                console.log('New Chat button not found!');
+            }
+        }, 1000);
+    };
+    
+    // Global function to test chat history functionality
+    window.testChatHistory = function() {
+        console.log('=== Testing Chat History ===');
+        console.log('Opening sidebar first...');
+        openSidebar();
+        
+        setTimeout(() => {
+            console.log('Checking chat history...');
+            const chatHistoryContainer = document.getElementById('chat-history-container');
+            if (chatHistoryContainer) {
+                console.log('Chat history container found');
+                console.log('Number of chat items:', chatHistoryContainer.children.length);
+                console.log('Saved chats:', savedChats.length);
+                
+                // Test clicking on first chat item if available
+                const firstChatItem = chatHistoryContainer.querySelector('.group');
+                if (firstChatItem) {
+                    console.log('First chat item found, testing click...');
+                    firstChatItem.click();
+                } else {
+                    console.log('No chat items found');
+                }
+            } else {
+                console.log('Chat history container not found!');
+            }
+        }, 1000);
+    };
+    
+    // Global function to test sign-in modal on mobile
+    window.testSignInModal = function() {
+        console.log('=== Testing Sign-In Modal ===');
+        console.log('Opening sign-in modal...');
+        const signInModal = document.getElementById('sign-in-modal');
+        if (signInModal) {
+            signInModal.classList.add('active');
+            console.log('Sign-in modal opened');
+            
+            setTimeout(() => {
+                console.log('Checking input fields...');
+                const emailInput = document.getElementById('sign-in-email');
+                const passwordInput = document.getElementById('sign-in-password');
+                
+                if (emailInput) {
+                    console.log('Email input found');
+                    console.log('Email input font-size:', window.getComputedStyle(emailInput).fontSize);
+                    console.log('Email input height:', window.getComputedStyle(emailInput).height);
+                    console.log('Email input padding:', window.getComputedStyle(emailInput).padding);
+                } else {
+                    console.log('Email input not found!');
+                }
+                
+                if (passwordInput) {
+                    console.log('Password input found');
+                    console.log('Password input font-size:', window.getComputedStyle(passwordInput).fontSize);
+                    console.log('Password input height:', window.getComputedStyle(passwordInput).height);
+                    console.log('Password input padding:', window.getComputedStyle(passwordInput).padding);
+                } else {
+                    console.log('Password input not found!');
+                }
+            }, 500);
+        } else {
+            console.log('Sign-in modal not found!');
+        }
+    };
+    
     // Close sidebar function
     function closeSidebar() {
         console.log('Closing sidebar'); // Debug log
-        sidebar.classList.add('-translate-x-full');
-        sidebarOverlay.classList.add('hidden');
+        
+        if (sidebar) {
+            sidebar.classList.add('-translate-x-full');
+            sidebar.classList.remove('translate-x-0'); // Remove the open class
+            console.log('Sidebar classes after closing:', sidebar.className);
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.classList.add('hidden');
+            console.log('Sidebar overlay classes after closing:', sidebarOverlay.className);
+        }
+        
         document.body.classList.remove('sidebar-open');
         
         // Reset any inline styles from dragging
-        sidebar.style.transform = '';
-        sidebar.style.opacity = '';
+        if (sidebar) {
+            sidebar.style.transform = '';
+            sidebar.style.opacity = '';
+        }
+        
+        console.log('Sidebar should now be closed');
     }
     
     
@@ -3612,15 +4032,96 @@
     
     // --- TOUCH GESTURE FUNCTIONALITY ---
     
+    // Global swipe detection for better reliability
+    let globalTouchStartX = 0;
+    let globalTouchStartY = 0;
+    let isGlobalDragging = false;
+    
+    // Add global touch event listeners for swipe detection
+    document.addEventListener('touchstart', (e) => {
+        // Only handle if sidebar is open and we're on mobile
+        const isSidebarOpen = sidebar && (!sidebar.classList.contains('-translate-x-full') || 
+                                         sidebar.classList.contains('translate-x-0') ||
+                                         (sidebarOverlay && !sidebarOverlay.classList.contains('hidden')));
+        
+        if (window.innerWidth <= 768 && isSidebarOpen) {
+            globalTouchStartX = e.touches[0].clientX;
+            globalTouchStartY = e.touches[0].clientY;
+            isGlobalDragging = true;
+            
+            console.log('Global swipe touch start detected at:', globalTouchStartX, globalTouchStartY);
+        }
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (isGlobalDragging && window.innerWidth <= 768) {
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const deltaX = currentX - globalTouchStartX;
+            const deltaY = currentY - globalTouchStartY;
+            
+            // Only handle horizontal swipes
+            if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX < 0) {
+                // Provide visual feedback
+                if (sidebar) {
+                    const translateX = Math.max(deltaX, -sidebar.offsetWidth);
+                    sidebar.style.transform = `translateX(${translateX}px)`;
+                    
+                    const opacity = 1 + (deltaX / sidebar.offsetWidth) * 0.3;
+                    sidebar.style.opacity = Math.max(opacity, 0.7);
+                }
+                
+                console.log('Global swipe in progress:', deltaX);
+            }
+        }
+    }, { passive: true });
+    
+    document.addEventListener('touchend', (e) => {
+        if (isGlobalDragging && window.innerWidth <= 768) {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaX = touchEndX - globalTouchStartX;
+            const deltaY = touchEndY - globalTouchStartY;
+            const swipeThreshold = 100; // Threshold for closing sidebar
+            
+            console.log('Global swipe touch end - deltaX:', deltaX, 'deltaY:', deltaY);
+            
+            // Reset sidebar position
+            if (sidebar) {
+                sidebar.style.transform = '';
+                sidebar.style.opacity = '';
+            }
+            
+            // Check if it's a valid left swipe
+            if (deltaX < -swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
+                console.log('Valid global left swipe detected, closing sidebar');
+                closeSidebar();
+            } else {
+                console.log('Global swipe not sufficient, keeping sidebar open');
+            }
+            
+            isGlobalDragging = false;
+        }
+    }, { passive: true });
+    
     // Add touch event listeners to sidebar for swipe gestures
     if (sidebar) {
         // Touch start
         sidebar.addEventListener('touchstart', (e) => {
-            if (window.innerWidth <= 768 && !sidebar.classList.contains('-translate-x-full')) {
+            // Check if sidebar is open (either not hidden or has translate-x-0 class)
+            const isSidebarOpen = !sidebar.classList.contains('-translate-x-full') || 
+                                 sidebar.classList.contains('translate-x-0') ||
+                                 !sidebarOverlay.classList.contains('hidden');
+            
+            console.log('Sidebar touch start - isOpen:', isSidebarOpen, 'width:', window.innerWidth);
+            
+            if (window.innerWidth <= 768 && isSidebarOpen) {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
                 isDragging = true;
                 sidebarStartX = 0; // Sidebar is at 0 when open
+                
+                console.log('Swipe touch start detected at:', touchStartX, touchStartY); // Debug log
                 
                 // Prevent default to avoid scrolling
                 e.preventDefault();
@@ -3647,6 +4148,8 @@
                         // Add visual feedback with opacity
                         const opacity = 1 + (deltaX / sidebar.offsetWidth) * 0.3;
                         sidebar.style.opacity = Math.max(opacity, 0.7);
+                        
+                        console.log('Swipe in progress:', deltaX); // Debug log
                     }
                 }
             }
@@ -3660,20 +4163,21 @@
                 
                 const deltaX = touchEndX - touchStartX;
                 const deltaY = touchEndY - touchStartY;
-                const swipeThreshold = 50; // Minimum distance for swipe
-                const velocityThreshold = 0.3; // Minimum velocity for swipe
+                const swipeThreshold = 80; // Increased threshold for better reliability
+                
+                console.log('Swipe touch end - deltaX:', deltaX, 'deltaY:', deltaY); // Debug log
                 
                 // Reset sidebar position and opacity
                 sidebar.style.transform = '';
                 sidebar.style.opacity = '';
                 
                 // Check if it's a valid left swipe
-                if (Math.abs(deltaX) > Math.abs(deltaY) && 
-                    deltaX < -swipeThreshold && 
-                    Math.abs(deltaX) > Math.abs(deltaY) * 2) {
-                    
+                // More lenient conditions for better swipe detection
+                if (deltaX < -swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
                     console.log('Left swipe detected, closing sidebar');
                     closeSidebar();
+                } else {
+                    console.log('Swipe not sufficient, keeping sidebar open');
                 }
                 
                 isDragging = false;
@@ -3688,6 +4192,7 @@
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
                 isDragging = true;
+                console.log('Overlay swipe touch start detected'); // Debug log
             }
         });
         
@@ -3698,14 +4203,16 @@
                 
                 const deltaX = touchEndX - touchStartX;
                 const deltaY = touchEndY - touchStartY;
-                const swipeThreshold = 30;
+                const swipeThreshold = 80; // Increased threshold for better reliability
+                
+                console.log('Overlay swipe touch end - deltaX:', deltaX, 'deltaY:', deltaY); // Debug log
                 
                 // Check if it's a valid left swipe on overlay
-                if (Math.abs(deltaX) > Math.abs(deltaY) && 
-                    deltaX < -swipeThreshold) {
-                    
+                if (deltaX < -swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
                     console.log('Left swipe on overlay detected, closing sidebar');
                     closeSidebar();
+                } else {
+                    console.log('Overlay swipe not sufficient, keeping sidebar open');
                 }
                 
                 isDragging = false;
@@ -3718,6 +4225,25 @@
         console.log('Mobile sidebar button:', mobileSidebarBtn);
         console.log('Sidebar:', sidebar);
         console.log('Sidebar overlay:', sidebarOverlay);
+        
+        // Add fallback mobile sidebar functionality
+        if (mobileSidebarBtn && !mobileSidebarBtn.hasAttribute('data-listener-added')) {
+            mobileSidebarBtn.setAttribute('data-listener-added', 'true');
+            
+            // Add a more direct event listener as fallback
+            mobileSidebarBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                console.log('Mobile sidebar button mousedown fallback');
+                openSidebar();
+            });
+            
+            // Add pointer events for better mobile support
+            mobileSidebarBtn.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                console.log('Mobile sidebar button pointerdown fallback');
+                openSidebar();
+            });
+        }
     });
     
     // Mobile button event listeners
@@ -4579,20 +5105,44 @@
                             </button>
                         </div>
                     ` : ''}
-                    <div class="absolute -bottom-3 -right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="absolute -bottom-3 -right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                         ${sender === 'bot' ? `
-                            <button title="Copy Text" class="copy-btn btn-futuristic p-1 rounded-full" data-text="${message.replace(/"/g, '&quot;')}">
+                            <button title="Copy Text" class="copy-btn btn-futuristic p-1 rounded-full flex flex-col items-center gap-1" data-text="${message.replace(/"/g, '&quot;')}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                                 </svg>
+                                <span class="mobile-label text-xs hidden md:hidden">Copy</span>
                             </button>
                         ` : ''}
                         ${sender === 'bot' && !metadata.imageUrl ? `
-                            <button title="Fact-Check" class="fact-check-btn btn-futuristic p-1 rounded-full" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg></button>
-                            <button title="Make Shorter" class="refine-btn btn-futuristic p-1 rounded-full" data-action="shorter" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                            <button title="Simplify" class="refine-btn btn-futuristic p-1 rounded-full" data-action="simpler" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.34-3 3 0 1.66 1.34 3 3 3 1.66 0 3-1.34 3-3 0-1.66-1.34-3-3-3z"/></svg></button>
-                            <button title="Text to Speech" class="tts-btn btn-futuristic p-1 rounded-full" data-text="${message}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></button>
+                            <button title="Fact-Check" class="fact-check-btn btn-futuristic p-1 rounded-full flex flex-col items-center gap-1" data-text="${message}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    <path d="m9 12 2 2 4-4"></path>
+                                </svg>
+                                <span class="mobile-label text-xs hidden md:hidden">Verify</span>
+                            </button>
+                            <button title="Make Shorter" class="refine-btn btn-futuristic p-1 rounded-full flex flex-col items-center gap-1" data-action="shorter" data-text="${message}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span class="mobile-label text-xs hidden md:hidden">Shorter</span>
+                            </button>
+                            <button title="Simplify" class="refine-btn btn-futuristic p-1 rounded-full flex flex-col items-center gap-1" data-action="simpler" data-text="${message}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/>
+                                    <path d="M7.07 14.94c-1.66 0-3 1.34-3 3 0 1.66 1.34 3 3 3 1.66 0 3-1.34 3-3 0-1.66-1.34-3-3-3z"/>
+                                </svg>
+                                <span class="mobile-label text-xs hidden md:hidden">Simplify</span>
+                            </button>
+                            <button title="Text to Speech" class="tts-btn btn-futuristic p-1 rounded-full flex flex-col items-center gap-1" data-text="${message}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                </svg>
+                                <span class="mobile-label text-xs hidden md:hidden">Speak</span>
+                            </button>
                         ` : ''}
                      </div>
                 </div>
@@ -4896,7 +5446,11 @@
             
             if (currentUser) {
                 // Delete from Supabase
-                await deleteChatFromSupabase(chatId);
+                const success = await deleteChatFromSupabase(chatId);
+                if (success) {
+                    // Reload chats from Supabase to update local array
+                    await loadUserChats();
+                }
             } else {
                 // Delete from localStorage
                 savedChats = savedChats.filter(c => c.id !== chatId);
@@ -5628,25 +6182,73 @@
                     <div class="truncate text-sm font-medium">${chat.title}</div>
                     <div class="text-xs text-gray-500">${timestamp}</div>
                 </div>
-                <button class="delete-chat-btn text-gray-500 hover:text-red-400 p-1 rounded transition-all duration-200" data-id="${chat.id}" title="Delete chat">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button class="delete-chat-btn text-gray-500 hover:text-red-400 p-2 rounded-lg transition-all duration-200 flex items-center justify-center" data-id="${chat.id}" title="Delete chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
                         <path d="M3 6h18"></path>
                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                         <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
                     </svg>
                 </button>
             `;
             
+            // Unified touch/click handler for chat history items
+            let chatItemTouchHandled = false;
+            
+            // Click event for desktop
             item.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('delete-chat-btn') && !e.target.closest('.delete-chat-btn')) {
+                    if (!chatItemTouchHandled) {
+                        console.log('Chat history item clicked:', chat.title);
+                        loadChat(chat.id);
+                    }
+                }
+            });
+            
+            // Touch events for mobile
+            item.addEventListener('touchstart', (e) => {
+                chatItemTouchHandled = false;
+                e.stopPropagation();
+                console.log('Chat history item touch start:', chat.title);
+            });
+            
+            item.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Chat history item touch end:', chat.title);
+                
+                if (!chatItemTouchHandled && !e.target.classList.contains('delete-chat-btn') && !e.target.closest('.delete-chat-btn')) {
+                    chatItemTouchHandled = true;
+                    console.log('Loading chat from touch:', chat.title);
                     loadChat(chat.id);
                 }
             });
             
             const deleteBtn = item.querySelector('.delete-chat-btn');
+            
+            // Unified touch/click handler for better mobile compatibility
+            let touchHandled = false;
+            
+            deleteBtn.addEventListener('touchstart', (e) => {
+                touchHandled = false;
+                e.stopPropagation();
+            });
+            
+            deleteBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!touchHandled) {
+                    touchHandled = true;
+                    confirmDeleteChat(chat.id, chat.title);
+                }
+            });
+            
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                confirmDeleteChat(chat.id, chat.title);
+                if (!touchHandled) {
+                    confirmDeleteChat(chat.id, chat.title);
+                }
             });
             
             chatHistoryContainer.appendChild(item);
