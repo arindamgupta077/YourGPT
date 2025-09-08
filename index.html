@@ -24,6 +24,20 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Simple welcome screen styles */
+        #welcome-screen {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            height: 100% !important;
+            min-height: 400px !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: 100% !important;
+            background: transparent !important;
+        }
         /* Futuristic Theme Variables */
         :root {
             --primary-neon: #00ffff;
@@ -40,6 +54,12 @@
             --border-neon: rgba(0, 255, 255, 0.3);
             --shadow-neon: 0 0 20px rgba(0, 255, 255, 0.3);
             --shadow-neon-strong: 0 0 30px rgba(0, 255, 255, 0.6);
+        }
+
+
+        /* Ensure chat container shows welcome screen */
+        #chat-container {
+            position: relative;
         }
 
         /* Mobile-first responsive design */
@@ -162,12 +182,23 @@
             min-height: 60px;
         }
             
-            /* Mobile welcome screen */
-            #welcome-screen {
-                height: calc(100vh - 200px);
-                height: calc(100dvh - 200px);
-                padding: 1.5rem 0.75rem;
-            }
+        /* Mobile welcome screen */
+        #welcome-screen {
+            height: calc(100vh - 200px);
+            height: calc(100dvh - 200px);
+            padding: 1.5rem 0.75rem;
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            min-height: 400px;
+        }
             
             /* Mobile modals */
             .modal-content {
@@ -361,6 +392,13 @@
             
             #welcome-screen {
                 padding: 1rem 0.5rem;
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: relative;
+                z-index: 10;
+                width: 100%;
+                min-height: 300px;
             }
             
             h2 {
@@ -1073,6 +1111,24 @@
             #new-chat-sidebar-btn {
                 min-height: 44px;
                 touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+                cursor: pointer;
+                pointer-events: auto;
+                position: relative;
+                z-index: 10;
+            }
+            
+            /* Ensure button is clickable on mobile */
+            @media (max-width: 768px) {
+                #new-chat-sidebar-btn {
+                    min-height: 48px;
+                    padding: 12px 16px;
+                    font-size: 16px;
+                    -webkit-tap-highlight-color: rgba(0, 255, 255, 0.2);
+                }
             }
             
             /* Delete buttons mobile styling */
@@ -1653,12 +1709,18 @@
         </header>
         
         <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6 futuristic-scrollbar" style="height: calc(100vh - 140px); position: relative; z-index: 1;">
-            <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center">
-                <div class="rounded-full p-4 mb-4 glow-neon" style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1)); border: 2px solid var(--primary-neon);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-neon); filter: drop-shadow(0 0 15px var(--primary-neon));"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+            <div id="welcome-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 2rem;">
+                <div style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2)); border: 2px solid #00ffff; border-radius: 50%; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 10px #00ffff);">
+                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                        <path d="M5 3v4"/>
+                        <path d="M19 17v4"/>
+                        <path d="M3 5h4"/>
+                        <path d="M17 19h4"/>
+                    </svg>
                 </div>
-                <h2 class="text-3xl font-bold mb-2 text-glow-strong" style="color: var(--primary-neon); font-family: 'Orbitron', monospace;">Hello, I'm YourGPT</h2>
-                <p class="max-w-md" style="color: var(--text-secondary);">I'm your personal AI assistant. How can I help you today?</p>
+                <h1 style="color: #00ffff; font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">Hello, I'm YourGPT</h1>
+                <p style="color: #b0b0b0; font-size: 1.2rem; max-width: 500px; margin: 0 auto; line-height: 1.6;">I'm your personal AI assistant. How can I help you today?</p>
             </div>
         </div>
         
@@ -2018,10 +2080,64 @@
     };
 
     // --- INITIALIZATION ---
-    document.addEventListener('DOMContentLoaded', () => {
-        loadChatsFromLocalStorage();
-        populatePersonas();
-        initAuth(); // Initialize authentication
+    document.addEventListener('DOMContentLoaded', async () => {
+        console.log('DOMContentLoaded - Starting initialization');
+        console.log('welcomeScreen element:', welcomeScreen);
+        console.log('chatContainer element:', chatContainer);
+        
+        // Show welcome screen immediately
+        console.log('Showing welcome screen immediately');
+        try {
+            showWelcomeScreen();
+            console.log('showWelcomeScreen completed successfully');
+        } catch (error) {
+            console.error('showWelcomeScreen failed:', error);
+        }
+        
+        try {
+            populatePersonas();
+            console.log('populatePersonas completed');
+        } catch (error) {
+            console.error('populatePersonas failed:', error);
+        }
+        
+        try {
+            await initAuth(); // Initialize authentication
+            console.log('initAuth completed, currentUser:', currentUser);
+        } catch (error) {
+            console.error('initAuth failed, continuing without auth:', error);
+            currentUser = null;
+        }
+        
+        // Initialize chat history manager
+        try {
+            console.log('About to initialize chat history manager, currentUser:', currentUser);
+            await chatHistoryManager.initialize();
+            console.log('ChatHistoryManager initialization completed, savedChats.length:', savedChats.length);
+            console.log('savedChats content:', savedChats);
+        } catch (error) {
+            console.error('ChatHistoryManager initialization failed:', error);
+        }
+        
+        // Ensure welcome screen is shown after all initialization
+        setTimeout(() => {
+            try {
+                console.log('Checking welcome screen visibility...');
+                console.log('savedChats.length:', savedChats.length);
+                console.log('activeChatId:', activeChatId);
+                console.log('chatContainer.children.length:', chatContainer.children.length);
+                
+                // Only show welcome screen if there are no chats and no active chat
+                if (savedChats.length === 0 && !activeChatId) {
+                    console.log('No chats found, showing welcome screen');
+                    ensureWelcomeScreenVisible();
+                } else {
+                    console.log('Chats found, not showing welcome screen');
+                }
+            } catch (error) {
+                console.error('setTimeout callback failed:', error);
+            }
+        }, 100);
     });
 
     // --- EVENT LISTENERS ---
@@ -2407,6 +2523,7 @@
     if (sidebarElement) {
         console.log('Adding event delegation for sidebar New Chat button');
         sidebarElement.addEventListener('click', (e) => {
+            console.log('Sidebar clicked, target:', e.target);
             // Check if the clicked element is the New Chat button or a child of it
             const newChatBtn = e.target.closest('#new-chat-sidebar-btn');
             if (newChatBtn) {
@@ -2429,10 +2546,60 @@
                 if (window.innerWidth <= 768) {
                     closeSidebar();
                 }
+            } else {
+                console.log('Click was not on New Chat button');
             }
         });
     } else {
         console.error('Sidebar element not found!');
+    }
+    
+    // Add direct event listener to New Chat button as backup
+    const newChatBtn = document.getElementById('new-chat-sidebar-btn');
+    if (newChatBtn) {
+        console.log('Adding direct event listener to New Chat button');
+        
+        // Add click event
+        newChatBtn.addEventListener('click', (e) => {
+            console.log('Direct New Chat button click event triggered');
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Add visual feedback
+            newChatBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                newChatBtn.style.transform = '';
+            }, 150);
+            
+            startNewChat();
+            
+            // Focus on message input for better UX
+            setTimeout(() => {
+                messageInput.focus();
+            }, 100);
+            
+            // Close sidebar on mobile after starting new chat
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+        
+        // Add touch event for mobile
+        newChatBtn.addEventListener('touchstart', (e) => {
+            console.log('New Chat button touch start');
+            e.preventDefault();
+        });
+        
+        newChatBtn.addEventListener('touchend', (e) => {
+            console.log('New Chat button touch end');
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Trigger the click event
+            newChatBtn.click();
+        });
+    } else {
+        console.error('New Chat button not found!');
     }
     codeHelperBtnMobile.addEventListener('click', () => {
         codeHelperModal.classList.add('active');
@@ -2697,8 +2864,7 @@
         activeSystemInstruction = null;
         clearImageAttachment();
         personaIndicator.textContent = '';
-        chatContainer.innerHTML = '';
-        welcomeScreen.style.display = 'flex';
+        showWelcomeScreen();
         messageInput.value = '';
         suggestedPromptsContainer.innerHTML = '';
         renderChatHistory();
@@ -2710,7 +2876,8 @@
         const userMessage = messageInput.value.trim();
         if (!userMessage && !attachedImageData.b64) return;
         
-        if (welcomeScreen.style.display !== 'none') welcomeScreen.style.display = 'none';
+        // Hide welcome screen when user starts chatting
+        hideWelcomeScreen();
         suggestedPromptsContainer.innerHTML = '';
         
         const userParts = [];
@@ -2894,84 +3061,399 @@
     }
 
     // --- CHAT HISTORY MANAGEMENT ---
-    async function saveCurrentChat() {
-        if (chatHistory.length === 0) return;
+    
+    // Enhanced Chat History Manager
+    class ChatHistoryManager {
+        constructor() {
+            this.storageKey = 'yourGptChats';
+            this.isInitialized = false;
+            this.initPromise = null;
+        }
 
-        if (currentUser) {
-            // Save to Supabase for authenticated users
-            if (activeChatId) {
-                // Update existing chat
-                const chat = savedChats.find(c => c.id === activeChatId);
-                if (chat) {
-                    chat.history = chatHistory;
-                    chat.systemInstruction = activeSystemInstruction;
-                    await updateChatInSupabase(activeChatId, chat);
-                }
-            } else {
-                // Create new chat
-                const firstUserMessagePart = chatHistory.find(m => m.role === 'user')?.parts?.find(p => p.text);
-                const title = firstUserMessagePart ? firstUserMessagePart.text : "New Chat";
-                const newChat = {
-                    title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
-                    history: chatHistory,
-                    systemInstruction: activeSystemInstruction
-                };
-                
-                const savedChat = await saveChatToSupabase(newChat);
-                if (savedChat) {
-                    savedChats.unshift({
-                        id: savedChat.id,
-                        title: savedChat.title,
-                        history: savedChat.history,
-                        systemInstruction: savedChat.system_instruction,
-                        timestamp: new Date(savedChat.updated_at).getTime()
-                    });
-                    activeChatId = savedChat.id;
-                }
+        async initialize() {
+            if (this.isInitialized) {
+                console.log('ChatHistoryManager: Already initialized, skipping');
+                return;
             }
-        } else {
-            // Fallback to localStorage for non-authenticated users
-            if (activeChatId) {
-                const chat = savedChats.find(c => c.id === activeChatId);
-                if (chat) {
-                     chat.history = chatHistory;
-                     chat.systemInstruction = activeSystemInstruction;
-                }
-            } else {
-                const firstUserMessagePart = chatHistory.find(m => m.role === 'user')?.parts?.find(p => p.text);
-                const title = firstUserMessagePart ? firstUserMessagePart.text : "New Chat";
-                const newChat = {
-                    id: Date.now(),
-                    title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
-                    history: chatHistory,
-                    systemInstruction: activeSystemInstruction
-                };
-                savedChats.unshift(newChat);
-                activeChatId = newChat.id;
+            if (this.initPromise) {
+                console.log('ChatHistoryManager: Initialization in progress, waiting...');
+                return this.initPromise;
             }
             
-            localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
+            console.log('ChatHistoryManager: Starting initialization...');
+            this.initPromise = this._doInitialize();
+            return this.initPromise;
         }
-        renderChatHistory();
+
+        async _doInitialize() {
+            console.log('ChatHistoryManager: Initializing...');
+            
+            try {
+                // Load chats from localStorage first (for non-authenticated users)
+                await this.loadFromLocalStorage();
+                
+                // If user is authenticated, load from Supabase
+                if (currentUser) {
+                    await this.loadFromSupabase();
+                }
+                
+                // Render the chat history
+                this.render();
+                
+                this.isInitialized = true;
+                console.log('ChatHistoryManager: Initialization complete, savedChats.length:', savedChats.length);
+            } catch (error) {
+                console.error('ChatHistoryManager: Initialization failed:', error);
+                // Fallback to localStorage only
+                await this.loadFromLocalStorage();
+                this.render();
+                this.isInitialized = true;
+            }
+        }
+
+        async loadFromLocalStorage() {
+            console.log('ChatHistoryManager: Loading from localStorage...');
+            const chats = localStorage.getItem(this.storageKey);
+            console.log('ChatHistoryManager: Raw localStorage data:', chats);
+            
+            if (chats) {
+                try {
+                    const parsedChats = JSON.parse(chats);
+                    console.log('ChatHistoryManager: Parsed chats:', parsedChats);
+                    
+                    if (Array.isArray(parsedChats)) {
+                        savedChats = parsedChats;
+                        console.log('ChatHistoryManager: Loaded', savedChats.length, 'chats from localStorage');
+                        console.log('ChatHistoryManager: savedChats after load:', savedChats);
+                    } else {
+                        console.warn('ChatHistoryManager: Parsed data is not an array:', parsedChats);
+                        savedChats = [];
+                    }
+                } catch (error) {
+                    console.error('ChatHistoryManager: Failed to parse localStorage chats:', error);
+                    savedChats = [];
+                }
+            } else {
+                console.log('ChatHistoryManager: No chats in localStorage');
+                savedChats = [];
+            }
+        }
+
+        async loadFromSupabase() {
+            if (!currentUser) return;
+            console.log('ChatHistoryManager: Loading from Supabase...');
+            try {
+                const userChats = await loadUserChats();
+                if (userChats && userChats.length > 0) {
+                    savedChats = userChats;
+                    console.log('ChatHistoryManager: Loaded', savedChats.length, 'chats from Supabase');
+                }
+            } catch (error) {
+                console.error('ChatHistoryManager: Failed to load from Supabase:', error);
+            }
+        }
+
+        async saveCurrentChat() {
+            if (chatHistory.length === 0) return;
+
+            console.log('ChatHistoryManager: Saving current chat...');
+
+            if (currentUser) {
+                // Save to Supabase for authenticated users
+                if (activeChatId) {
+                    // Update existing chat
+                    const chat = savedChats.find(c => c.id === activeChatId);
+                    if (chat) {
+                        chat.history = chatHistory;
+                        chat.systemInstruction = activeSystemInstruction;
+                        await updateChatInSupabase(activeChatId, chat);
+                    }
+                } else {
+                    // Create new chat
+                    const firstUserMessagePart = chatHistory.find(m => m.role === 'user')?.parts?.find(p => p.text);
+                    const title = firstUserMessagePart ? firstUserMessagePart.text : "New Chat";
+                    const newChat = {
+                        title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
+                        history: chatHistory,
+                        systemInstruction: activeSystemInstruction
+                    };
+                    
+                    const savedChat = await saveChatToSupabase(newChat);
+                    if (savedChat) {
+                        savedChats.unshift({
+                            id: savedChat.id,
+                            title: savedChat.title,
+                            history: savedChat.history,
+                            systemInstruction: savedChat.system_instruction,
+                            timestamp: new Date(savedChat.updated_at).getTime()
+                        });
+                        activeChatId = savedChat.id;
+                    }
+                }
+            } else {
+                // Save to localStorage for non-authenticated users
+                if (activeChatId) {
+                    // Update existing chat
+                    const chat = savedChats.find(c => c.id === activeChatId);
+                    if (chat) {
+                        chat.history = chatHistory;
+                        chat.systemInstruction = activeSystemInstruction;
+                    }
+                } else {
+                    // Create new chat
+                    const firstUserMessagePart = chatHistory.find(m => m.role === 'user')?.parts?.find(p => p.text);
+                    const title = firstUserMessagePart ? firstUserMessagePart.text : "New Chat";
+                    const newChat = {
+                        id: Date.now(),
+                        title: title.substring(0, 30) + (title.length > 30 ? '...' : ''),
+                        history: chatHistory,
+                        systemInstruction: activeSystemInstruction,
+                        timestamp: Date.now()
+                    };
+                    savedChats.unshift(newChat);
+                    activeChatId = newChat.id;
+                }
+                
+                // Always save to localStorage for non-authenticated users
+                this.saveToLocalStorage();
+            }
+            
+            this.render();
+        }
+
+        saveToLocalStorage() {
+            try {
+                localStorage.setItem(this.storageKey, JSON.stringify(savedChats));
+                console.log('ChatHistoryManager: Saved', savedChats.length, 'chats to localStorage');
+            } catch (error) {
+                console.error('ChatHistoryManager: Failed to save to localStorage:', error);
+            }
+        }
+
+        render() {
+            console.log('ChatHistoryManager: Rendering chat history...');
+            renderChatHistory();
+        }
+
+        async deleteChat(chatId) {
+            console.log('ChatHistoryManager: Deleting chat:', chatId);
+            
+            if (currentUser) {
+                // Delete from Supabase
+                await deleteChatFromSupabase(chatId);
+            } else {
+                // Delete from localStorage
+                savedChats = savedChats.filter(c => c.id !== chatId);
+                this.saveToLocalStorage();
+            }
+            
+            if (activeChatId === chatId) {
+                startNewChat();
+            } else {
+                this.render();
+            }
+        }
+
+        clearAllChats() {
+            console.log('ChatHistoryManager: Clearing all chats...');
+            savedChats = [];
+            if (!currentUser) {
+                this.saveToLocalStorage();
+            }
+            startNewChat();
+        }
+    }
+
+    // Create global instance
+    const chatHistoryManager = new ChatHistoryManager();
+
+    // Legacy function for backward compatibility
+    async function saveCurrentChat() {
+        return chatHistoryManager.saveCurrentChat();
     }
     
     function loadChatsFromLocalStorage() {
+        console.log('loadChatsFromLocalStorage called, currentUser:', currentUser);
         // Only load from localStorage if user is not authenticated
         if (!currentUser) {
             const chats = localStorage.getItem('yourGptChats');
+            console.log('localStorage chats:', chats);
             if (chats) {
                 savedChats = JSON.parse(chats);
+                console.log('Parsed savedChats:', savedChats);
                 renderChatHistory();
+            } else {
+                console.log('No chats in localStorage');
             }
+            // Welcome screen will be shown by main initialization
+        } else {
+            console.log('User is authenticated, skipping localStorage load');
         }
         // For authenticated users, chats are loaded via loadUserChats() in initAuth()
     }
 
+    function showWelcomeScreen() {
+        console.log('showWelcomeScreen called - new simple version');
+        
+        // Clear chat container
+        chatContainer.innerHTML = '';
+        
+        // Create new welcome screen content
+        const welcomeHTML = `
+            <div id="welcome-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 2rem;">
+                <div style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2)); border: 2px solid #00ffff; border-radius: 50%; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 10px #00ffff);">
+                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                        <path d="M5 3v4"/>
+                        <path d="M19 17v4"/>
+                        <path d="M3 5h4"/>
+                        <path d="M17 19h4"/>
+                    </svg>
+                </div>
+                <h1 style="color: #00ffff; font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">Hello, I'm YourGPT</h1>
+                <p style="color: #b0b0b0; font-size: 1.2rem; max-width: 500px; margin: 0 auto; line-height: 1.6;">I'm your personal AI assistant. How can I help you today?</p>
+            </div>
+        `;
+        
+        // Insert the welcome screen
+        chatContainer.innerHTML = welcomeHTML;
+        
+        console.log('Welcome screen created and inserted');
+        console.log('Chat container children:', chatContainer.children.length);
+    }
+
+    function hideWelcomeScreen() {
+        console.log('hideWelcomeScreen called');
+        
+        // Check if welcome screen exists and remove it
+        const welcomeScreenElement = document.getElementById('welcome-screen');
+        if (welcomeScreenElement) {
+            console.log('Removing welcome screen element');
+            welcomeScreenElement.remove();
+        } else {
+            console.log('No welcome screen element found to remove');
+        }
+        
+        // Also clear the chat container to ensure clean state
+        if (chatContainer.children.length === 0) {
+            console.log('Chat container is empty, welcome screen already hidden');
+        }
+    }
+
+    function ensureWelcomeScreenVisible() {
+        console.log('ensureWelcomeScreenVisible called');
+        console.log('savedChats.length:', savedChats.length);
+        console.log('activeChatId:', activeChatId);
+        console.log('chatContainer.children.length:', chatContainer.children.length);
+        
+        // Check if we should show the welcome screen
+        if (savedChats.length === 0 && !activeChatId) {
+            console.log('Conditions met - showing welcome screen');
+            showWelcomeScreen();
+        } else {
+            console.log('Conditions not met - not showing welcome screen');
+        }
+    }
+
+    // Make functions available globally for testing
+    window.showWelcomeScreen = showWelcomeScreen;
+    window.hideWelcomeScreen = hideWelcomeScreen;
+    window.ensureWelcomeScreenVisible = ensureWelcomeScreenVisible;
+    
+    // Add a test function to manually trigger welcome screen
+    window.testWelcomeScreen = function() {
+        console.log('Manual test - showing welcome screen');
+        showWelcomeScreen();
+    };
+    
+    // Add a test function to manually trigger new chat
+    window.testNewChat = function() {
+        console.log('Manual test - starting new chat');
+        startNewChat();
+    };
+    
+    // Add a function to manually load chats from localStorage
+    window.loadChats = function() {
+        console.log('Manual test - loading chats from localStorage');
+        loadChatsFromLocalStorage();
+        console.log('Current savedChats:', savedChats);
+    };
+    
+    // Add a function to reinitialize chat history manager
+    window.reinitChatHistory = async function() {
+        console.log('Manual test - reinitializing chat history manager');
+        chatHistoryManager.isInitialized = false;
+        chatHistoryManager.initPromise = null;
+        await chatHistoryManager.initialize();
+        console.log('Chat history manager reinitialized, savedChats:', savedChats);
+    };
+    
+    // Add a function to manually render chat history
+    window.renderChats = function() {
+        console.log('Manual test - rendering chat history');
+        renderChatHistory();
+        console.log('Chat history container after render:', chatHistoryContainer);
+    };
+    
+    // Add a function to check sidebar state
+    window.checkSidebar = function() {
+        const sidebar = document.getElementById('sidebar');
+        const computedStyle = window.getComputedStyle(sidebar);
+        console.log('Sidebar element:', sidebar);
+        console.log('Sidebar transform:', computedStyle.transform);
+        console.log('Sidebar display:', computedStyle.display);
+        console.log('Sidebar visibility:', computedStyle.visibility);
+        console.log('Sidebar opacity:', computedStyle.opacity);
+        console.log('Sidebar classes:', sidebar.className);
+        console.log('Chat history container:', chatHistoryContainer);
+        console.log('Chat history container children:', chatHistoryContainer.children.length);
+        console.log('Chat history container innerHTML:', chatHistoryContainer.innerHTML.substring(0, 200) + '...');
+    };
+    
+    // Add a function to force open sidebar
+    window.openSidebar = function() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('translate-x-0');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            overlay.classList.add('block');
+        }
+        document.body.classList.add('sidebar-open');
+        console.log('Sidebar forced open');
+    };
+    
+    // Add a function to check chat history manager state
+    window.checkChatHistoryState = function() {
+        console.log('=== Chat History Manager State ===');
+        console.log('Manager initialized:', chatHistoryManager.isInitialized);
+        console.log('Current user:', currentUser);
+        console.log('Saved chats length:', savedChats.length);
+        console.log('Saved chats:', savedChats);
+        console.log('Active chat ID:', activeChatId);
+        console.log('Chat history container:', chatHistoryContainer);
+        console.log('Chat history container children:', chatHistoryContainer?.children.length);
+        console.log('localStorage chats:', localStorage.getItem('yourGptChats'));
+        console.log('===================================');
+    };
+
     function renderChatHistory() {
+        console.log('renderChatHistory called, savedChats.length:', savedChats.length);
+        console.log('savedChats:', savedChats);
+        console.log('chatHistoryContainer element:', chatHistoryContainer);
+        console.log('chatHistoryContainer exists:', !!chatHistoryContainer);
+        
+        if (!chatHistoryContainer) {
+            console.error('chatHistoryContainer element not found!');
+            return;
+        }
+        
         chatHistoryContainer.innerHTML = '';
         
         // Add chat count and bulk delete button if there are chats
         if (savedChats.length > 0) {
+            console.log('Rendering chat history with', savedChats.length, 'chats');
             const headerContainer = document.createElement('div');
             headerContainer.className = 'mb-3 px-2';
             headerContainer.innerHTML = `
@@ -2988,6 +3470,7 @@
                 </button>
             `;
             chatHistoryContainer.appendChild(headerContainer);
+            console.log('Header container appended, chatHistoryContainer children:', chatHistoryContainer.children.length);
             
             // Add event listener for bulk delete
             const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
@@ -2995,6 +3478,7 @@
         }
         
         if (savedChats.length === 0) {
+            console.log('renderChatHistory - showing empty state');
             const emptyState = document.createElement('div');
             emptyState.className = 'text-center py-8';
             emptyState.innerHTML = `
@@ -3050,7 +3534,11 @@
             });
             
             chatHistoryContainer.appendChild(item);
+            console.log('Chat item appended, total children:', chatHistoryContainer.children.length);
         });
+        
+        console.log('renderChatHistory completed, final children count:', chatHistoryContainer.children.length);
+        console.log('chatHistoryContainer innerHTML length:', chatHistoryContainer.innerHTML.length);
     }
     
     function loadChat(chatId) {
@@ -3064,7 +3552,7 @@
         clearImageAttachment();
         
         chatContainer.innerHTML = '';
-        welcomeScreen.style.display = 'none';
+        hideWelcomeScreen();
 
         chat.history.forEach(turn => {
             const messageText = turn.parts.find(p => p.text)?.text || '';
@@ -3086,26 +3574,8 @@
     }
     
     async function deleteChat(chatId) {
-        if (currentUser) {
-            // Delete from Supabase for authenticated users
-            const success = await deleteChatFromSupabase(chatId);
-            if (success) {
-                savedChats = savedChats.filter(c => c.id !== chatId);
-            } else {
-                alert('Failed to delete chat. Please try again.');
-                return;
-            }
-        } else {
-            // Delete from localStorage for non-authenticated users
-            savedChats = savedChats.filter(c => c.id !== chatId);
-            localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
-        }
-        
-        if (activeChatId === chatId) {
-            startNewChat();
-        } else {
-            renderChatHistory();
-        }
+        console.log('deleteChat called with chatId:', chatId);
+        return chatHistoryManager.deleteChat(chatId);
     }
     
     function confirmDeleteChat(chatId, chatTitle) {
@@ -3190,10 +3660,8 @@
         });
         
         document.getElementById('confirm-bulk-delete-btn').addEventListener('click', () => {
-            // Delete all chats
-            savedChats = [];
-            localStorage.setItem('yourGptChats', JSON.stringify(savedChats));
-            startNewChat(); // Reset to welcome screen
+            // Delete all chats using the manager
+            chatHistoryManager.clearAllChats();
             document.body.removeChild(modal);
         });
         
@@ -3591,7 +4059,7 @@
             const userTimestamp = Date.now();
             const botTimestamp = userTimestamp + 1;
 
-            if (welcomeScreen.style.display !== 'none') welcomeScreen.style.display = 'none';
+            hideWelcomeScreen();
 
             addMessageToChat('user', userMessage, {}, userTimestamp);
             addMessageToChat('bot', botMessage, { imageUrl }, botTimestamp);
@@ -3866,29 +4334,53 @@
 
     // Initialize authentication state
     async function initAuth() {
+        console.log('initAuth called');
         try {
+            console.log('About to call supabase.auth.getSession()');
             const { data: { session } } = await supabase.auth.getSession();
+            console.log('supabase.auth.getSession() completed, session:', session);
             currentUser = session?.user || null;
+            console.log('initAuth - currentUser set to:', currentUser);
             updateAuthUI(currentUser);
+            console.log('updateAuthUI completed');
 
             // Listen for auth changes
+            console.log('Setting up auth state change listener');
             supabase.auth.onAuthStateChange((event, session) => {
+                console.log('Auth state changed:', event, session);
+                const previousUser = currentUser;
                 currentUser = session?.user || null;
                 updateAuthUI(currentUser);
                 
+                // Only handle actual state changes, not initial session
+                if (event === 'INITIAL_SESSION') {
+                    console.log('Initial session event - skipping chat history changes');
+                    return;
+                }
+                
                 // Load user's chat history when they sign in
-                if (currentUser) {
+                if (currentUser && !previousUser) {
+                    console.log('User signed in - loading Supabase chats');
                     loadUserChats();
-                } else {
-                    // Clear chat history when user signs out
+                } else if (!currentUser && previousUser) {
+                    console.log('User signed out - clearing chat history and loading localStorage');
+                    // Clear current chat
                     chatContainer.innerHTML = '';
                     chatHistory = [];
-                    savedChats = [];
-                    renderChatHistory();
+                    // Load from localStorage for non-authenticated users
+                    chatHistoryManager.loadFromLocalStorage().then(() => {
+                        chatHistoryManager.render();
+                        // Ensure welcome screen is shown if no chats
+                        setTimeout(() => {
+                            ensureWelcomeScreenVisible();
+                        }, 100);
+                    });
                 }
             });
+            console.log('initAuth completed successfully');
         } catch (error) {
             console.error('Auth initialization error:', error);
+            console.error('Error details:', error.message, error.stack);
         }
     }
 
@@ -3964,9 +4456,14 @@
                 timestamp: new Date(chat.updated_at).getTime()
             }));
             
-            renderChatHistory();
+            if (savedChats.length === 0) {
+                // Welcome screen will be shown by main initialization
+            } else {
+                renderChatHistory();
+            }
         } catch (error) {
             console.error('Error loading user chats:', error);
+            // Welcome screen will be shown by main initialization
         }
     }
 
